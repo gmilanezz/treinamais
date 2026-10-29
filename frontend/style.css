@@ -185,7 +185,7 @@
 .btn {
   border: 1px solid #fff;
   border-radius: 12px;
-  padding: 9px 13px;
+  padding: 11px 15px;
   background: #fff;
   color: #050505;
   font-weight: 900;
@@ -195,7 +195,6 @@
   letter-spacing: 0.035em;
   font-size: 18px;
 }
-
 .btn:hover {
   transform: translateY(-1px);
   background: var(--accent);
@@ -213,6 +212,7 @@
   border-color: rgba(255, 255, 255, 0.45);
   color: #fff;
   margin-right: 10px;
+  margin-bottom: 10px;
 }
 .btn.ghost:hover,
 .btn.action:hover,
@@ -1702,3 +1702,6 @@
   .agenda-form, .student-schedule-form, .payment-plan { width: 100%; min-width: 0; }
   .agenda-input, .student-schedule-date, .student-schedule-time, .payment-plan .form-control { min-height: 44px; }
 }
+
+/* Ícone vetorial de avaliação: independente da fonte e do emoji do dispositivo. */
+.student-evaluation-svg { display: block; width: 21px; height: 21px; flex: 0 0 21px; color: #ffffff; }
