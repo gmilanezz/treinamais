@@ -185,7 +185,7 @@
 .btn {
   border: 1px solid #fff;
   border-radius: 12px;
-  padding: 11px 15px;
+  padding: 9px 13px;
   background: #fff;
   color: #050505;
   font-weight: 900;
@@ -195,6 +195,7 @@
   letter-spacing: 0.035em;
   font-size: 18px;
 }
+
 .btn:hover {
   transform: translateY(-1px);
   background: var(--accent);
@@ -211,6 +212,7 @@
   background: #030303;
   border-color: rgba(255, 255, 255, 0.45);
   color: #fff;
+  margin-right: 10px;
 }
 .btn.ghost:hover,
 .btn.action:hover,
@@ -729,15 +731,23 @@
   gap: 0;
 }
 .nav-logo-only .brand-logo {
-  width: 64px;
-  height: 64px;
+  width: 50px;
+  height: 50px;
   object-fit: contain;
 }
 .auth-card .page-heading.accent {
   color: var(--accent);
 }
 
-.workout-periodization { margin: 0 0 10px; color: var(--muted); font-size: 13px; line-height: 1.4; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.workout-periodization {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
 
 .side-label {
   font-size: inherit;
@@ -779,7 +789,6 @@
   border-radius: 999px;
 }
 
-
 /* iOS/Safari: impede campos de data/hora de ultrapassarem o card */
 .field,
 .app-form,
@@ -808,120 +817,888 @@
 }
 
 /* Agenda, treinos e pagamentos — identidade original preservada */
-.lesson-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:20px 0}.lesson-calendar-weekday{text-align:center}.calendar-day{min-height:60px;border:1px solid #555;border-radius:8px;padding:7px;display:flex;flex-wrap:wrap;align-content:start;gap:5px}.calendar-day-number{width:100%}.calendar-head{display:flex;justify-content:space-between;align-items:center}.lesson-dot{width:11px;height:11px;border:1px solid #777;border-radius:50%;display:inline-block}.lesson-dot.pending,.lesson-status.pending{background:#fff;color:#111}.lesson-dot.cancelled,.lesson-status.cancelled{background:#000;color:#fff;border:1px solid #aaa}.lesson-dot.completed,.lesson-status.completed{background:#a8f0bd;color:#111}.lesson-status{padding:5px 10px;border-radius:6px;font-size:12px}.lesson-controls{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.exercise-edit,.exercise-panel{padding:18px;border:1px solid #555;border-radius:12px;margin:14px 0}.exercise-panel-summary,.workout-slide-summary,.payment-student-summary{cursor:pointer;font-weight:700;padding:12px}.set-form{display:flex;align-items:end;flex-wrap:wrap;gap:12px;padding:12px;border-bottom:1px solid #555}.set-form-load-input{max-width:115px;padding:9px}.load-bars{height:155px;display:flex;align-items:end;gap:9px;overflow-x:auto;padding:18px 0}.load-bar{background:#65f6d2;min-width:35px;position:relative;border-radius:4px 4px 0 0}.load-bar-label{position:absolute;bottom:100%;font-size:10px;white-space:nowrap}.payment-page{display:grid;gap:12px}.payment-student-content{padding:15px}.payment-student-toggle{display:flex;justify-content:space-between}.payment-check{display:flex;align-items:center;gap:8px}.workout-preview{padding:10px}.workout-slide{margin:12px 0}.form-control,.form-select,.form-textarea,.agenda-input,.agenda-select,.student-schedule-date,.student-schedule-time{max-width:100%;box-sizing:border-box}
+.lesson-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 5px;
+  margin: 20px 0;
+}
+.lesson-calendar-weekday {
+  text-align: center;
+}
+.calendar-day {
+  min-height: 60px;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 7px;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  gap: 5px;
+}
+.calendar-day-number {
+  width: 100%;
+}
+.calendar-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.lesson-dot {
+  width: 11px;
+  height: 11px;
+  border: 1px solid #777;
+  border-radius: 50%;
+  display: inline-block;
+}
+.lesson-dot.pending,
+.lesson-status.pending {
+  background: #fff;
+  color: #111;
+}
+.lesson-dot.cancelled,
+.lesson-status.cancelled {
+  background: #000;
+  color: #fff;
+  border: 1px solid #aaa;
+}
+.lesson-dot.completed,
+.lesson-status.completed {
+  background: #a8f0bd;
+  color: #111;
+}
+.lesson-status {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+}
+.lesson-controls {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.exercise-edit,
+.exercise-panel {
+  padding: 18px;
+  border: 1px solid #555;
+  border-radius: 12px;
+  margin: 14px 0;
+}
+.exercise-panel-summary,
+.workout-slide-summary,
+.payment-student-summary {
+  cursor: pointer;
+  font-weight: 700;
+  padding: 12px;
+}
+.set-form {
+  display: flex;
+  align-items: end;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 12px;
+  border-bottom: 1px solid #555;
+}
+.set-form-load-input {
+  max-width: 115px;
+  padding: 9px;
+}
+.load-bars {
+  height: 155px;
+  display: flex;
+  align-items: end;
+  gap: 9px;
+  overflow-x: auto;
+  padding: 18px 0;
+}
+.load-bar {
+  background: #65f6d2;
+  min-width: 35px;
+  position: relative;
+  border-radius: 4px 4px 0 0;
+}
+.load-bar-label {
+  position: absolute;
+  bottom: 100%;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.payment-page {
+  display: grid;
+  gap: 12px;
+}
+.payment-student-content {
+  padding: 15px;
+}
+.payment-student-toggle {
+  display: flex;
+  justify-content: space-between;
+}
+.payment-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.workout-preview {
+  padding: 10px;
+}
+.workout-slide {
+  margin: 12px 0;
+}
+.form-control,
+.form-select,
+.form-textarea,
+.agenda-input,
+.agenda-select,
+.student-schedule-date,
+.student-schedule-time {
+  max-width: 100%;
+  box-sizing: border-box;
+}
 
 /* Componentes exclusivos: calendário por aluno */
-.student-calendar-panel{background:#050505;border:1px solid #555;border-radius:14px;padding:16px;min-width:0}
-.student-calendar-panel .calendar-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:18px 0}
-.student-calendar-panel .lesson-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
-.student-calendar-panel .calendar-day{border:0;border-radius:0;min-height:55px;padding:7px 2px;display:flex;flex-direction:column;align-items:center;gap:5px}
-.student-calendar-panel .calendar-day-number{width:auto;text-align:center}
-.student-calendar-panel .lesson-dot{width:9px;height:9px;flex-shrink:0;border-radius:50%}
-.student-calendar-back,.student-calendar-button,.student-payment-button,.student-schedule-submit,.student-lesson-check,.student-lesson-delete{border:1px solid #777;border-radius:9px;padding:10px;background:#090909;color:#fff;cursor:pointer;font-family:inherit}
-.student-schedule-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:15px 0}
-.student-schedule-label{display:grid;gap:6px;min-width:0}
-.student-schedule-date,.student-schedule-time{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;padding:12px;border:1px solid #777;border-radius:8px;background:#080808;color:#fff;color-scheme:dark}
-.student-schedule-submit{grid-column:1/-1;background:#65f6d2;color:#000;border:0;font-weight:bold}
-.student-lessons{display:grid;gap:10px;margin-top:18px}
-.student-lesson-row{display:flex;align-items:center;flex-wrap:wrap;gap:9px;padding:12px;border:1px solid #555;border-radius:10px}
-.student-lesson-check{background:#a8f0bd;color:#000}
-.student-lesson-delete{background:#111}
+.student-calendar-panel {
+  background: #050505;
+  border: 1px solid #555;
+  border-radius: 14px;
+  padding: 16px;
+  min-width: 0;
+}
+.student-calendar-panel .calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 18px 0;
+}
+.student-calendar-panel .lesson-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+.student-calendar-panel .calendar-day {
+  border: 0;
+  border-radius: 0;
+  min-height: 55px;
+  padding: 7px 2px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.student-calendar-panel .calendar-day-number {
+  width: auto;
+  text-align: center;
+}
+.student-calendar-panel .lesson-dot {
+  width: 9px;
+  height: 9px;
+  flex-shrink: 0;
+  border-radius: 50%;
+}
+.student-calendar-back,
+.student-calendar-button,
+.student-payment-button,
+.student-schedule-submit,
+.student-lesson-check,
+.student-lesson-delete {
+  border: 1px solid #777;
+  border-radius: 9px;
+  padding: 10px;
+  background: #090909;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+}
+.student-schedule-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 15px 0;
+}
+.student-schedule-label {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.student-schedule-date,
+.student-schedule-time {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #777;
+  border-radius: 8px;
+  background: #080808;
+  color: #fff;
+  color-scheme: dark;
+}
+.student-schedule-submit {
+  grid-column: 1/-1;
+  background: #65f6d2;
+  color: #000;
+  border: 0;
+  font-weight: bold;
+}
+.student-lessons {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+.student-lesson-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid #555;
+  border-radius: 10px;
+}
+.student-lesson-check {
+  background: #a8f0bd;
+  color: #000;
+}
+.student-lesson-delete {
+  background: #111;
+}
 /* Player de treino em tela cheia, sem seletores globais */
-.training-player{position:fixed;z-index:100;inset:0;overflow-y:auto;background:#050505;color:#fff;display:flex;flex-direction:column;align-items:center;gap:18px;padding:24px 16px 36px;box-sizing:border-box;text-align:center}
-.training-player-back{align-self:flex-start;background:none;color:#fff;border:0;font-size:16px;cursor:pointer}
-.training-player-title{font-size:clamp(24px,6vw,42px);margin:8px 0}
-.training-player-stage{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;width:100%;max-width:540px}
-.training-player-progress{color:#65f6d2;font-size:16px}
-.training-player-exercise{font-size:clamp(30px,9vw,58px);line-height:1.12;margin:0}
-.training-player-series{font-size:26px;font-weight:700}
-.training-player-note{font-size:16px;color:#ddd}
-.training-player-form{display:grid;gap:18px;width:100%;max-width:350px}
-.training-player-load-label{display:grid;gap:10px;text-align:left}
-.training-player-load{width:100%;padding:17px;border:1px solid #777;border-radius:10px;background:#111;color:#fff;font-size:24px;box-sizing:border-box}
-.training-player-check{background:#65f6d2;color:#000;border:0;border-radius:10px;padding:18px;font-weight:800;font-size:20px;cursor:pointer}
-.training-player-timer{margin-top:auto;display:grid;gap:6px;color:#ccc}
-.training-player-timer-value{color:#fff;font-size:34px;font-variant-numeric:tabular-nums}
-.training-player-start,.training-player-finish{padding:15px 22px;border-radius:9px;border:1px solid #65f6d2;background:#65f6d2;color:#000;font-weight:800;cursor:pointer}
-.training-player-start:disabled,.training-player-finish:disabled{opacity:.35;cursor:default}
+.training-player {
+  position: fixed;
+  z-index: 100;
+  inset: 0;
+  overflow-y: auto;
+  background: #050505;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  padding: 24px 16px 36px;
+  box-sizing: border-box;
+  text-align: center;
+}
+.training-player-back {
+  align-self: flex-start;
+  background: none;
+  color: #fff;
+  border: 0;
+  font-size: 16px;
+  cursor: pointer;
+}
+.training-player-title {
+  font-size: clamp(24px, 6vw, 42px);
+  margin: 8px 0;
+}
+.training-player-stage {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  max-width: 540px;
+}
+.training-player-progress {
+  color: #65f6d2;
+  font-size: 16px;
+}
+.training-player-exercise {
+  font-size: clamp(30px, 9vw, 58px);
+  line-height: 1.12;
+  margin: 0;
+}
+.training-player-series {
+  font-size: 26px;
+  font-weight: 700;
+}
+.training-player-note {
+  font-size: 16px;
+  color: #ddd;
+}
+.training-player-form {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  max-width: 350px;
+}
+.training-player-load-label {
+  display: grid;
+  gap: 10px;
+  text-align: left;
+}
+.training-player-load {
+  width: 100%;
+  padding: 17px;
+  border: 1px solid #777;
+  border-radius: 10px;
+  background: #111;
+  color: #fff;
+  font-size: 24px;
+  box-sizing: border-box;
+}
+.training-player-check {
+  background: #65f6d2;
+  color: #000;
+  border: 0;
+  border-radius: 10px;
+  padding: 18px;
+  font-weight: 800;
+  font-size: 20px;
+  cursor: pointer;
+}
+.training-player-timer {
+  margin-top: auto;
+  display: grid;
+  gap: 6px;
+  color: #ccc;
+}
+.training-player-timer-value {
+  color: #fff;
+  font-size: 34px;
+  font-variant-numeric: tabular-nums;
+}
+.training-player-start,
+.training-player-finish {
+  padding: 15px 22px;
+  border-radius: 9px;
+  border: 1px solid #65f6d2;
+  background: #65f6d2;
+  color: #000;
+  font-weight: 800;
+  cursor: pointer;
+}
+.training-player-start:disabled,
+.training-player-finish:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
 
 /* Minha agenda: componentes isolados, sem seletores globais */
-.agenda-layout{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
-.agenda-schedule-card,.agenda-daily-card{border:1px solid var(--line);border-radius:12px;padding:18px;min-width:0}
-.agenda-title{font-family:"Bebas Neue",sans-serif;font-size:28px;font-weight:400;margin:0 0 14px}
-.agenda-form{display:grid;gap:14px}.agenda-field{display:grid;gap:6px;font-size:13px;text-transform:uppercase}
-.agenda-input,.agenda-select{font:inherit;width:100%;min-width:0;padding:12px;border:1px solid var(--line);border-radius:9px;background:#050505;color:#fff;color-scheme:dark}
-.agenda-submit{font:inherit;cursor:pointer;border:0;border-radius:8px;background:#fff;color:#000;padding:13px;font-weight:800}
-.agenda-date{color:var(--muted);font-size:13px;margin:0 0 16px}
-.agenda-daily-list{display:grid;gap:10px}.agenda-lesson{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:10px;flex-wrap:wrap}
-.agenda-lesson-info{display:grid;gap:4px}.agenda-student-name{font-size:15px}.agenda-lesson-time{font-size:13px}.agenda-lesson-status{font-size:11px}
-.agenda-status-pending{color:#fff}.agenda-status-cancelled{color:#a9b0ae}.agenda-status-completed{color:#a8f0bd}
-.agenda-actions{display:flex;gap:8px}.agenda-complete,.agenda-delete{font:inherit;cursor:pointer;padding:10px 13px;border:1px solid #fff;border-radius:8px;background:#fff;color:#000;font-weight:800}
-.agenda-complete:disabled{opacity:.5;cursor:default}.agenda-delete{background:transparent;color:#fff}.agenda-empty{color:var(--muted);font-size:13px}
+.agenda-layout {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+}
+.agenda-schedule-card,
+.agenda-daily-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  min-width: 0;
+}
+.agenda-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  margin: 0 0 14px;
+}
+.agenda-form {
+  display: grid;
+  gap: 14px;
+}
+.agenda-field {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  text-transform: uppercase;
+}
+.agenda-input,
+.agenda-select {
+  font: inherit;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: #050505;
+  color: #fff;
+  color-scheme: dark;
+}
+.agenda-submit {
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  color: #000;
+  padding: 13px;
+  font-weight: 800;
+}
+.agenda-date {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 16px;
+}
+.agenda-daily-list {
+  display: grid;
+  gap: 10px;
+}
+.agenda-lesson {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+.agenda-lesson-info {
+  display: grid;
+  gap: 4px;
+}
+.agenda-student-name {
+  font-size: 15px;
+}
+.agenda-lesson-time {
+  font-size: 13px;
+}
+.agenda-lesson-status {
+  font-size: 11px;
+}
+.agenda-status-pending {
+  color: #fff;
+}
+.agenda-status-cancelled {
+  color: #a9b0ae;
+}
+.agenda-status-completed {
+  color: #a8f0bd;
+}
+.agenda-actions {
+  display: flex;
+  gap: 8px;
+}
+.agenda-complete,
+.agenda-delete {
+  font: inherit;
+  cursor: pointer;
+  padding: 10px 13px;
+  border: 1px solid #fff;
+  border-radius: 8px;
+  background: #fff;
+  color: #000;
+  font-weight: 800;
+}
+.agenda-complete:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.agenda-delete {
+  background: transparent;
+  color: #fff;
+}
+.agenda-empty {
+  color: var(--muted);
+  font-size: 13px;
+}
 
 /* Ajustes de navegação e escala, restritos aos componentes */
-.calendar-arrow{border:0!important;background:transparent!important;color:#fff!important;font-family:"Bebas Neue",sans-serif;font-size:25px;padding:5px 10px;cursor:pointer;box-shadow:none!important}
-.row-actions{gap:12px!important;flex-wrap:wrap!important}
-.row-actions .ui-button,.row-actions .student-calendar-button,.row-actions .student-payment-button{font-family:"Bebas Neue",sans-serif!important;font-size:17px!important;min-width:45px;padding:8px 10px!important;line-height:1.1;flex-shrink:0}
-.student-calendar-action,.agenda-action,.training-player-action,.student-workout-summary{font-family:"Bebas Neue",sans-serif!important;letter-spacing:.3px}
-.student-schedule-submit,.agenda-submit,.training-player-start,.training-player-finish,.training-player-check{font-size:90%!important;padding-block:11px!important}
-.student-calendar-panel .calendar-head{gap:15px}
-.student-workout-entry{border:1px solid var(--line);border-radius:9px;margin:10px 0;padding:8px 12px}
-.student-workout-summary{cursor:pointer;font-size:19px;padding:7px 0}
-.student-workout-exercises{display:grid;gap:9px;padding:10px 0}
-.student-workout-exercise{display:flex;gap:10px;align-items:center;flex-wrap:wrap;border-top:1px solid var(--line);padding:9px 0}
-.student-workout-exercise-note{width:100%;color:var(--muted)}
-.student-workout-empty{color:var(--muted)}
+.calendar-arrow {
+  border: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 25px;
+  padding: 5px 10px;
+  cursor: pointer;
+  box-shadow: none !important;
+}
+.row-actions {
+  gap: 12px !important;
+  flex-wrap: wrap !important;
+}
+.row-actions .ui-button,
+.row-actions .student-calendar-button,
+.row-actions .student-payment-button {
+  font-family: "Bebas Neue", sans-serif !important;
+  font-size: 17px !important;
+  min-width: 45px;
+  padding: 8px 10px !important;
+  line-height: 1.1;
+  flex-shrink: 0;
+}
+.student-calendar-action,
+.agenda-action,
+.training-player-action,
+.student-workout-summary {
+  font-family: "Bebas Neue", sans-serif !important;
+  letter-spacing: 0.3px;
+}
+.student-schedule-submit,
+.agenda-submit,
+.training-player-start,
+.training-player-finish,
+.training-player-check {
+  font-size: 90% !important;
+  padding-block: 11px !important;
+}
+.student-calendar-panel .calendar-head {
+  gap: 15px;
+}
+.student-workout-entry {
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  margin: 10px 0;
+  padding: 8px 12px;
+}
+.student-workout-summary {
+  cursor: pointer;
+  font-size: 19px;
+  padding: 7px 0;
+}
+.student-workout-exercises {
+  display: grid;
+  gap: 9px;
+  padding: 10px 0;
+}
+.student-workout-exercise {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--line);
+  padding: 9px 0;
+}
+.student-workout-exercise-note {
+  width: 100%;
+  color: var(--muted);
+}
+.student-workout-empty {
+  color: var(--muted);
+}
 
 /* Navegação individual dos alunos: componentes independentes */
-.student-list-row{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between}
-.student-list-info{min-width:100px;flex:1}
-.student-nav-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.student-nav-button{display:inline-flex;align-items:center;justify-content:center;width:39px;height:39px;min-width:39px;padding:6px;background:#080808;color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:9px;cursor:pointer}
-.student-nav-icon{font-size:21px;line-height:1;filter:grayscale(1) brightness(0) invert(1);display:inline-block}
-.student-nav-button:hover{border-color:var(--accent)}
-.student-profile-card{padding:20px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
-.student-profile-back{font-family:'Bebas Neue',sans-serif;background:transparent;color:#fff;border:0;font-size:20px;cursor:pointer;margin-bottom:12px}
-.student-profile-title{font-family:'Bebas Neue',sans-serif;font-size:26px;margin:0 0 15px}
-.student-profile-detail{font-size:14px;margin:10px 0;overflow-wrap:anywhere}
-.student-profile-notice{border-left:3px solid var(--accent);padding:10px 12px;line-height:1.5}
-.student-contact-form{display:grid;gap:16px}
-.student-contact-label{display:grid;gap:7px;font-size:14px}
-.student-contact-input{width:100%;padding:13px;background:#050505;color:#fff;border:1px solid var(--line);border-radius:8px;font:inherit}
-.student-contact-save{background:var(--accent);color:#030303;border:0;border-radius:8px;padding:12px;font:20px 'Bebas Neue',sans-serif;cursor:pointer}
+.student-list-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  justify-content: space-between;
+}
+.student-list-info {
+  min-width: 100px;
+  flex: 1;
+}
+.student-nav-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.student-nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 39px;
+  height: 39px;
+  min-width: 39px;
+  padding: 6px;
+  background: #080808;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 9px;
+  cursor: pointer;
+}
+.student-nav-icon {
+  font-size: 21px;
+  line-height: 1;
+  filter: grayscale(1) brightness(0) invert(1);
+  display: inline-block;
+}
+.student-nav-button:hover {
+  border-color: var(--accent);
+}
+.student-profile-card {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--surface);
+}
+.student-profile-back {
+  font-family: "Bebas Neue", sans-serif;
+  background: transparent;
+  color: #fff;
+  border: 0;
+  font-size: 20px;
+  cursor: pointer;
+  margin-bottom: 12px;
+}
+.student-profile-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 26px;
+  margin: 0 0 15px;
+}
+.student-profile-detail {
+  font-size: 14px;
+  margin: 10px 0;
+  overflow-wrap: anywhere;
+}
+.student-profile-notice {
+  border-left: 3px solid var(--accent);
+  padding: 10px 12px;
+  line-height: 1.5;
+}
+.student-contact-form {
+  display: grid;
+  gap: 16px;
+}
+.student-contact-label {
+  display: grid;
+  gap: 7px;
+  font-size: 14px;
+}
+.student-contact-input {
+  width: 100%;
+  padding: 13px;
+  background: #050505;
+  color: #fff;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+}
+.student-contact-save {
+  background: var(--accent);
+  color: #030303;
+  border: 0;
+  border-radius: 8px;
+  padding: 12px;
+  font:
+    20px "Bebas Neue",
+    sans-serif;
+  cursor: pointer;
+}
 
 /* Refatoração: classes explícitas por componente. */
-.ui-button,.agenda-submit,.agenda-action,.student-nav-button,.student-calendar-action,.student-schedule-submit,.student-contact-save,.training-player-action,.payment-student-toggle,.payment-check,.calendar-arrow,.student-workout-summary{font-family:"Bebas Neue",sans-serif;}
+.ui-button,
+.agenda-submit,
+.agenda-action,
+.student-nav-button,
+.student-calendar-action,
+.student-schedule-submit,
+.student-contact-save,
+.training-player-action,
+.payment-student-toggle,
+.payment-check,
+.calendar-arrow,
+.student-workout-summary {
+  font-family: "Bebas Neue", sans-serif;
+}
 
 /* Avaliação: classes específicas, sem regras globais para elementos HTML */
-.student-calendar-svg{width:19px;height:19px;display:block;color:#fff}
-.evaluation-panel{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
-.evaluation-title{font-family:'Bebas Neue',sans-serif;font-size:29px;margin:0 0 6px}
-.evaluation-description{font-size:13px;color:var(--muted);margin:0 0 18px}
-.evaluation-students{display:grid;gap:12px}
-.evaluation-student{border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.evaluation-student-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;background:transparent;color:var(--text);border:0;padding:15px;text-align:left;cursor:pointer;font-family:'Bebas Neue',sans-serif;font-size:20px}
-.evaluation-student-arrow{color:var(--accent);font-size:22px}
-.evaluation-student-detail{padding:14px;border-top:1px solid var(--line)}
-.evaluation-detail-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.evaluation-detail-title{font-size:20px;margin:0;font-family:'Bebas Neue',sans-serif}
-.evaluation-close{border:0;background:transparent;color:var(--text);font-size:22px;cursor:pointer;padding:8px}
-.evaluation-subtitle{font-family:'Bebas Neue',sans-serif;font-size:19px;margin:20px 0 10px}
-.evaluation-photo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-.evaluation-photo-link{color:var(--text);text-decoration:none}
-.evaluation-photo{display:block;width:100%;height:140px;object-fit:cover;border-radius:8px}
-.evaluation-photo-date,.evaluation-load-date{display:block;font-size:11px;color:var(--muted);margin-top:4px}
-.evaluation-weight-list,.evaluation-workout-list{display:grid;gap:9px}
-.evaluation-weight-row,.evaluation-load-row{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:10px;font-size:13px}
-.evaluation-workout{padding:8px 0}
-.evaluation-workout-name{font-family:'Bebas Neue',sans-serif;font-size:18px;margin:0 0 8px}
-.evaluation-empty,.evaluation-loading{color:var(--muted);font-size:13px}
-.evaluation-error{color:var(--danger);font-size:13px}
+.student-calendar-svg {
+  width: 19px;
+  height: 19px;
+  display: block;
+  color: #fff;
+}
+.evaluation-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+.evaluation-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 29px;
+  margin: 0 0 6px;
+}
+.evaluation-description {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 18px;
+}
+.evaluation-students {
+  display: grid;
+  gap: 12px;
+}
+.evaluation-student {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.evaluation-student-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: transparent;
+  color: var(--text);
+  border: 0;
+  padding: 15px;
+  text-align: left;
+  cursor: pointer;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 20px;
+}
+.evaluation-student-arrow {
+  color: var(--accent);
+  font-size: 22px;
+}
+.evaluation-student-detail {
+  padding: 14px;
+  border-top: 1px solid var(--line);
+}
+.evaluation-detail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.evaluation-detail-title {
+  font-size: 20px;
+  margin: 0;
+  font-family: "Bebas Neue", sans-serif;
+}
+.evaluation-close {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-size: 22px;
+  cursor: pointer;
+  padding: 8px;
+}
+.evaluation-subtitle {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 19px;
+  margin: 20px 0 10px;
+}
+.evaluation-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.evaluation-photo-link {
+  color: var(--text);
+  text-decoration: none;
+}
+.evaluation-photo {
+  display: block;
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+.evaluation-photo-date,
+.evaluation-load-date {
+  display: block;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+.evaluation-weight-list,
+.evaluation-workout-list {
+  display: grid;
+  gap: 9px;
+}
+.evaluation-weight-row,
+.evaluation-load-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  font-size: 13px;
+}
+.evaluation-workout {
+  padding: 8px 0;
+}
+.evaluation-workout-name {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+.evaluation-empty,
+.evaluation-loading {
+  color: var(--muted);
+  font-size: 13px;
+}
+.evaluation-error {
+  color: var(--danger);
+  font-size: 13px;
+}
 
 /* Calendário expansível exclusivo do card do aluno */
-.student-inline-calendar[hidden]{display:none!important}
-.student-inline-calendar{width:100%;flex-basis:100%;margin-top:14px;padding:14px 0 4px;border-top:1px solid var(--line)}
-.student-calendar-inline-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.student-calendar-inline-title{font-family:"Bebas Neue",sans-serif;font-size:22px;margin:0}
-.student-calendar-inline-close{border:0;background:transparent;color:var(--text);font-family:"Bebas Neue",sans-serif;font-size:24px;cursor:pointer;padding:4px 10px}
-.student-calendar-error{color:var(--danger);font-size:14px}
-.student-list-row{flex-wrap:wrap}
+.student-inline-calendar[hidden] {
+  display: none !important;
+}
+.student-inline-calendar {
+  width: 100%;
+  flex-basis: 100%;
+  margin-top: 14px;
+  padding: 14px 0 4px;
+  border-top: 1px solid var(--line);
+}
+.student-calendar-inline-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.student-calendar-inline-title {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 22px;
+  margin: 0;
+}
+.student-calendar-inline-close {
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px 10px;
+}
+.student-calendar-error {
+  color: var(--danger);
+  font-size: 14px;
+}
+.student-list-row {
+  flex-wrap: wrap;
+}
+
+/* Ajustes TreinaMais: inputs nativos do Safari/iOS, sem regras HTML genéricas */
+.agenda-layout, .agenda-schedule-card, .agenda-form, .agenda-field,
+.student-calendar-panel, .student-schedule-form, .student-schedule-label,
+.payment-page, .payment-plan, .payment-plan .field { min-width: 0; max-width: 100%; }
+.agenda-input, .student-schedule-date, .student-schedule-time,
+.payment-plan .form-control, .form-control[type="date"], .form-control[type="time"] {
+  display: block; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;
+  -webkit-appearance: none; appearance: none; font-size: 16px;
+}
+.agenda-input::-webkit-date-and-time-value,
+.student-schedule-date::-webkit-date-and-time-value,
+.student-schedule-time::-webkit-date-and-time-value,
+.payment-plan .form-control::-webkit-date-and-time-value { min-width: 0; text-align: left; }
+.agenda-input::-webkit-calendar-picker-indicator,
+.student-schedule-date::-webkit-calendar-picker-indicator,
+.student-schedule-time::-webkit-calendar-picker-indicator,
+.payment-plan .form-control::-webkit-calendar-picker-indicator { flex: 0 0 auto; margin-left: 4px; }
+/* Resumos expansíveis: título à esquerda, chevron à direita */
+.workout-slide-summary, .student-workout-summary, .payment-student-toggle {
+  display: flex; align-items: center; justify-content: space-between; gap: 14px;
+  width: 100%; min-width: 0; list-style: none; cursor: pointer;
+}
+.workout-slide-summary::-webkit-details-marker,
+.student-workout-summary::-webkit-details-marker,
+.payment-student-toggle::-webkit-details-marker { display: none; }
+.workout-slide-summary-label, .student-workout-summary-label { min-width: 0; flex: 1 1 auto; }
+.workout-slide-summary-chevron, .student-workout-summary-chevron,
+.evaluation-student-arrow { display: inline-block; flex: 0 0 10px; width: 10px; height: 10px;
+  border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent);
+  transform: rotate(45deg); transition: transform .2s ease; margin-right: 5px; }
+.workout-slide[open] .workout-slide-summary-chevron,
+.student-workout-entry[open] .student-workout-summary-chevron,
+.evaluation-student-toggle[aria-expanded="true"] .evaluation-student-arrow { transform: rotate(225deg); }
+.evaluation-student-arrow { font-size: 0; }
+@media (max-width: 600px) {
+  .agenda-form, .student-schedule-form, .payment-plan { width: 100%; min-width: 0; }
+  .agenda-input, .student-schedule-date, .student-schedule-time, .payment-plan .form-control { min-height: 44px; }
+}
