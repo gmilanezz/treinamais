@@ -61,6 +61,8 @@ class User(Base):
     email = Column(String, nullable=True)
     phone = Column(String, nullable=True)
     contact_pending = Column(Boolean, default=False)
+    theme_color = Column(String, nullable=True)
+    brand_logo = Column(Text, nullable=True)
 
 
 class Lesson(Base):
@@ -142,6 +144,11 @@ class WorkoutSet(Base):
     performed_at = Column(DateTime, default=datetime.utcnow)
 
 Base.metadata.create_all(engine)
+from sqlalchemy import inspect, text as sql_text
+with engine.begin() as conn:
+    cols = {c["name"] for c in inspect(conn).get_columns("users")}
+    for col, kind in (("theme_color", "VARCHAR"), ("brand_logo", "TEXT")):
+        if col not in cols: conn.execute(sql_text(f"ALTER TABLE users ADD COLUMN {col} {kind}"))
 
 # Migração idempotente para bancos já existentes.
 with engine.begin() as conn:
@@ -252,6 +259,33 @@ class WeightIn(BaseModel):
 
 
 INVITE_CODE = os.getenv("DANTE_INVITE_CODE", "DG5A1")
+
+
+class BrandingIn(BaseModel):
+    color: str = "#65f6d2"
+    logo: str | None = None
+    phone: str | None = None
+
+
+@app.get("/api/branding")
+def get_branding(u=Depends(me), s: Session = Depends(db)):
+    owner = u if u.role != "student" else s.get(User, u.professor_id)
+    return {"color": owner.theme_color or "#65f6d2", "logo": owner.brand_logo, "professor": owner.name, "phone": owner.phone or ""} if owner else {"color":"#65f6d2","logo":None,"professor":"","phone":""}
+
+
+@app.put("/api/branding")
+def put_branding(x: BrandingIn, u=Depends(me), s: Session = Depends(db)):
+    allow_prof(u)
+    import re
+    if not re.fullmatch(r"#[0-9a-fA-F]{6}", x.color):
+        raise HTTPException(422, "Cor inválida")
+    if x.logo and (len(x.logo) > 1400000 or not re.match(r"^data:image/(png|jpeg|webp);base64,", x.logo)):
+        raise HTTPException(422, "Imagem inválida")
+    u.theme_color = x.color
+    u.brand_logo = x.logo
+    if x.phone is not None: u.phone = x.phone
+    s.commit()
+    return {"ok":True}
 
 
 @app.get("/api/public/professors")
@@ -474,6 +508,29 @@ def save_workout(x: WorkoutIn, u=Depends(me), s: Session = Depends(db)):
     return {"id": w.id}
 
 
+@app.put("/api/workouts/{wid}")
+def edit_workout(wid: int, x: WorkoutIn, u=Depends(me), s: Session = Depends(db)):
+    allow_prof(u)
+    w=s.get(Workout,wid)
+    st=s.get(User,x.student_id)
+    if not w or (u.role!="admin" and w.professor_id!=u.id): raise HTTPException(404)
+    if not st or (u.role!="admin" and st.professor_id!=u.id): raise HTTPException(403)
+    w.student_id=x.student_id;w.title=x.title;w.content=x.content;w.periodization=x.periodization;w.updated_at=datetime.utcnow()
+    s.commit()
+    return {"ok":True}
+
+
+@app.delete("/api/workouts/{wid}")
+def delete_workout(wid: int, u=Depends(me), s: Session = Depends(db)):
+    allow_prof(u)
+    w=s.get(Workout,wid)
+    if not w or (u.role!="admin" and w.professor_id!=u.id): raise HTTPException(404)
+    s.query(WorkoutSet).filter(WorkoutSet.workout_id==wid).delete()
+    s.query(Completion).filter(Completion.workout_id==wid).delete()
+    s.delete(w);s.commit()
+    return {"ok":True}
+
+
 @app.get("/api/workouts/{wid}")
 def workout_detail(wid: int, u=Depends(me), s: Session = Depends(db)):
     w = s.get(Workout, wid)
@@ -681,7 +738,7 @@ def record_set(x:SetEntry,u=Depends(me),s:Session=Depends(db)):
     if not w or w.student_id!=u.id:raise HTTPException(404)
     try: exercises=json.loads(w.content)
     except (ValueError,TypeError):exercises=[]
-    match=next((e for e in exercises if e.get("key")==x.exercise_key),None) if isinstance(exercises,list) else None
+    match=next((e for i,e in enumerate(exercises) if isinstance(e,dict) and str(e.get("key") or f"exercise-{i}")==x.exercise_key),None) if isinstance(exercises,list) else None
     if not match or x.exercise_name!=match.get("name") or x.set_number<1 or x.set_number>int(match.get("sets",0)) or not 0<=x.load_kg<=2000:raise HTTPException(400,"Série inválida")
     s.add(WorkoutSet(workout_id=w.id,student_id=u.id,exercise_key=x.exercise_key,exercise_name=x.exercise_name,set_number=x.set_number,load_kg=x.load_kg));s.commit();return {"ok":True}
 
