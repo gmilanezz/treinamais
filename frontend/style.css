@@ -706,7 +706,6 @@
   }
 }
 
-/* V7 typography/navigation adjustments */
 .ui-button,
 .btn,
 .text-btn,
@@ -789,7 +788,6 @@
   border-radius: 999px;
 }
 
-/* iOS/Safari: impede campos de data/hora de ultrapassarem o card */
 .field,
 .app-form,
 .form-control,
@@ -816,7 +814,6 @@
   }
 }
 
-/* Agenda, treinos e pagamentos — identidade original preservada */
 .lesson-calendar {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -913,7 +910,7 @@
   padding: 18px 0;
 }
 .load-bar {
-  background: #65f6d2;
+  background: var(--team-color);
   min-width: 35px;
   position: relative;
   border-radius: 4px 4px 0 0;
@@ -957,7 +954,6 @@
   box-sizing: border-box;
 }
 
-/* Componentes exclusivos: calendário por aluno */
 .student-calendar-panel {
   background: #050505;
   border: 1px solid #555;
@@ -1038,7 +1034,7 @@
 }
 .student-schedule-submit {
   grid-column: 1/-1;
-  background: #65f6d2;
+  background: var(--team-color);
   color: #000;
   border: 0;
   font-weight: bold;
@@ -1064,7 +1060,7 @@
 .student-lesson-delete {
   background: #111;
 }
-/* Player de treino em tela cheia, sem seletores globais */
+
 .training-player {
   position: fixed;
   z-index: 100;
@@ -1103,7 +1099,7 @@
   max-width: 540px;
 }
 .training-player-progress {
-  color: #65f6d2;
+  color: var(--team-color);
   font-size: 16px;
 }
 .training-player-exercise {
@@ -1141,7 +1137,7 @@
   box-sizing: border-box;
 }
 .training-player-check {
-  background: #65f6d2;
+  background: var(--team-color);
   color: #000;
   border: 0;
   border-radius: 10px;
@@ -1165,8 +1161,8 @@
 .training-player-finish {
   padding: 15px 22px;
   border-radius: 9px;
-  border: 1px solid #65f6d2;
-  background: #65f6d2;
+  border: 1px solid var(--team-color);
+  background: var(--team-color);
   color: #000;
   font-weight: 800;
   cursor: pointer;
@@ -1177,7 +1173,6 @@
   cursor: default;
 }
 
-/* Minha agenda: componentes isolados, sem seletores globais */
 .agenda-layout {
   display: grid;
   gap: 14px;
@@ -1297,7 +1292,6 @@
   font-size: 13px;
 }
 
-/* Ajustes de navegação e escala, restritos aos componentes */
 .calendar-arrow {
   border: 0 !important;
   background: transparent !important;
@@ -1372,7 +1366,6 @@
   color: var(--muted);
 }
 
-/* Navegação individual dos alunos: componentes independentes */
 .student-list-row {
   display: flex;
   flex-wrap: wrap;
@@ -1473,7 +1466,6 @@
   cursor: pointer;
 }
 
-/* Refatoração: classes explícitas por componente. */
 .ui-button,
 .agenda-submit,
 .agenda-action,
@@ -1489,7 +1481,6 @@
   font-family: "Bebas Neue", sans-serif;
 }
 
-/* Avaliação: classes específicas, sem regras globais para elementos HTML */
 .student-calendar-svg {
   width: 19px;
   height: 19px;
@@ -1624,7 +1615,6 @@
   font-size: 13px;
 }
 
-/* Calendário expansível exclusivo do card do aluno */
 .student-inline-calendar[hidden] {
   display: none !important;
 }
@@ -1664,62 +1654,883 @@
   flex-wrap: wrap;
 }
 
-/* Ajustes TreinaMais: inputs nativos do Safari/iOS, sem regras HTML genéricas */
-.agenda-layout, .agenda-schedule-card, .agenda-form, .agenda-field,
-.student-calendar-panel, .student-schedule-form, .student-schedule-label,
-.payment-page, .payment-plan, .payment-plan .field { min-width: 0; max-width: 100%; }
-.agenda-input, .student-schedule-date, .student-schedule-time,
-.payment-plan .form-control, .form-control[type="date"], .form-control[type="time"] {
-  display: block; width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box;
-  -webkit-appearance: none; appearance: none; font-size: 16px;
+.agenda-layout,
+.agenda-schedule-card,
+.agenda-form,
+.agenda-field,
+.student-calendar-panel,
+.student-schedule-form,
+.student-schedule-label,
+.payment-page,
+.payment-plan,
+.payment-plan .field {
+  min-width: 0;
+  max-width: 100%;
+}
+.agenda-input,
+.student-schedule-date,
+.student-schedule-time,
+.payment-plan .form-control,
+.form-control[type="date"],
+.form-control[type="time"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  -webkit-appearance: none;
+  appearance: none;
+  font-size: 16px;
 }
 .agenda-input::-webkit-date-and-time-value,
 .student-schedule-date::-webkit-date-and-time-value,
 .student-schedule-time::-webkit-date-and-time-value,
-.payment-plan .form-control::-webkit-date-and-time-value { min-width: 0; text-align: left; }
+.payment-plan .form-control::-webkit-date-and-time-value {
+  min-width: 0;
+  text-align: left;
+}
 .agenda-input::-webkit-calendar-picker-indicator,
 .student-schedule-date::-webkit-calendar-picker-indicator,
 .student-schedule-time::-webkit-calendar-picker-indicator,
-.payment-plan .form-control::-webkit-calendar-picker-indicator { flex: 0 0 auto; margin-left: 4px; }
-/* Resumos expansíveis: título à esquerda, chevron à direita */
-.workout-slide-summary, .student-workout-summary, .payment-student-toggle {
-  display: flex; align-items: center; justify-content: space-between; gap: 14px;
-  width: 100%; min-width: 0; list-style: none; cursor: pointer;
+.payment-plan .form-control::-webkit-calendar-picker-indicator {
+  flex: 0 0 auto;
+  margin-left: 4px;
+}
+
+.workout-slide-summary,
+.student-workout-summary,
+.payment-student-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  min-width: 0;
+  list-style: none;
+  cursor: pointer;
 }
 .workout-slide-summary::-webkit-details-marker,
 .student-workout-summary::-webkit-details-marker,
-.payment-student-toggle::-webkit-details-marker { display: none; }
-.workout-slide-summary-label, .student-workout-summary-label { min-width: 0; flex: 1 1 auto; }
-.workout-slide-summary-chevron, .student-workout-summary-chevron,
-.evaluation-student-arrow { display: inline-block; flex: 0 0 10px; width: 10px; height: 10px;
-  border-right: 2px solid var(--accent); border-bottom: 2px solid var(--accent);
-  transform: rotate(45deg); transition: transform .2s ease; margin-right: 5px; }
+.payment-student-toggle::-webkit-details-marker {
+  display: none;
+}
+.workout-slide-summary-label,
+.student-workout-summary-label {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+.workout-slide-summary-chevron,
+.student-workout-summary-chevron,
+.evaluation-student-arrow {
+  display: inline-block;
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--accent);
+  border-bottom: 2px solid var(--accent);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+  margin-right: 5px;
+}
 .workout-slide[open] .workout-slide-summary-chevron,
 .student-workout-entry[open] .student-workout-summary-chevron,
-.evaluation-student-toggle[aria-expanded="true"] .evaluation-student-arrow { transform: rotate(225deg); }
-.evaluation-student-arrow { font-size: 0; }
+.evaluation-student-toggle[aria-expanded="true"] .evaluation-student-arrow {
+  transform: rotate(225deg);
+}
+.evaluation-student-arrow {
+  font-size: 0;
+}
 @media (max-width: 600px) {
-  .agenda-form, .student-schedule-form, .payment-plan { width: 100%; min-width: 0; }
-  .agenda-input, .student-schedule-date, .student-schedule-time, .payment-plan .form-control { min-height: 44px; }
+  .agenda-form,
+  .student-schedule-form,
+  .payment-plan {
+    width: 100%;
+    min-width: 0;
+  }
+  .agenda-input,
+  .student-schedule-date,
+  .student-schedule-time,
+  .payment-plan .form-control {
+    min-height: 44px;
+  }
 }
 
-/* Ícone vetorial de avaliação: independente da fonte e do emoji do dispositivo. */
-.student-evaluation-svg { display: block; width: 21px; height: 21px; flex: 0 0 21px; color: #ffffff; }
+.student-evaluation-svg {
+  display: block;
+  width: 21px;
+  height: 21px;
+  flex: 0 0 21px;
+  color: #ffffff;
+}
 
-:root{--team-color:#65f6d2}  .exercise-edit{max-width:540px;padding:12px;margin:8px 0;border:1px solid var(--team-color);border-radius:12px} .exercise-edit .form-control{max-width:100%} .evaluation-modes{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0} .evaluation-modes button{flex:1} .student-workout-entry{padding:12px;margin:8px 0} .side-icon{font-style:normal;font-size:20px} .contact-link img{display:block;margin:auto}
+:root {
+  --team-color: #65f6d2;
+}
+.exercise-edit {
+  max-width: 540px;
+  padding: 12px;
+  margin: 8px 0;
+  border: 1px solid var(--team-color);
+  border-radius: 12px;
+}
+.exercise-edit .form-control {
+  max-width: 100%;
+}
+.evaluation-modes {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 16px 0;
+}
+.evaluation-modes button {
+  flex: 1;
+}
+.student-workout-entry {
+  padding: 12px;
+  margin: 8px 0;
+}
+.side-icon {
+  font-style: normal;
+  font-size: 20px;
+}
+.contact-link img {
+  display: block;
+  margin: auto;
+}
 
-.btn-action{background:#090909!important;color:#fff!important;border:1px solid var(--team-color)!important}.btn-action:hover{background:#151515!important;color:#fff!important;box-shadow:0 0 0 2px var(--team-color)}button svg,button svg *,button .side-icon{color:inherit}button:disabled{opacity:.55}button:focus-visible{outline:2px solid var(--team-color);outline-offset:2px}.workout-management .student-workout-entry{background:#080808;border:1px solid var(--line);border-radius:12px;margin:10px 0;padding:12px}.workout-management .student-workout-summary{padding:4px 0}.workout-management .student-workout-editor .card{margin-top:14px}.workout-management .student-workout-editor .app-form{max-width:100%}.workout-management .exercise-edit{max-width:100%;margin:8px 0}.workout-management .payment-student-content{min-width:0}.workout-management .workout-item-content{padding-top:12px}.back-navigation{margin-right:12px;padding:8px 12px} .brand-logo{object-fit:contain}
+.btn-action {
+  background: #090909 !important;
+  color: #fff !important;
+  border: 1px solid var(--team-color) !important;
+}
+.btn-action:hover {
+  background: #151515 !important;
+  color: #fff !important;
+  box-shadow: 0 0 0 2px var(--team-color);
+}
+button svg,
+button svg *,
+button .side-icon {
+  color: inherit;
+}
+button:disabled {
+  opacity: 0.55;
+}
+button:focus-visible {
+  outline: 2px solid var(--team-color);
+  outline-offset: 2px;
+}
+.workout-management .student-workout-entry {
+  background: #080808;
+  border: 0;
+}
+.workout-management .student-workout-summary {
+  padding: 4px 0;
+}
+.workout-management .student-workout-editor .card {
+  margin-top: 14px;
+}
+.workout-management .student-workout-editor .app-form {
+  max-width: 100%;
+}
+.workout-management .exercise-edit {
+  max-width: 100%;
+  margin: 8px 0;
+}
+.workout-management .payment-student-content {
+  min-width: 0;
+}
+.workout-management .workout-item-content {
+  padding-top: 12px;
+}
+.back-navigation {
+  margin-right: 12px;
+  padding: 8px 12px;
+}
+.brand-logo {
+  object-fit: contain;
+}
 
+button:not(.menu-button):not(.menu-close):not(.side-link):not(
+    .back-navigation
+  ):not(.text-btn):not(.calendar-arrow):not(.student-workout-summary):not(
+    .payment-student-toggle
+  ):not(.student-nav-button):not(.student-calendar-button):not(
+    .student-payment-button
+  ):not(.student-workout-summary):not(.forgot-link) {
+  background: #000;
+  color: #fff;
+}
+.btn-action,
+.ui-button.btn:not(.back-navigation):not(.student-nav-button),
+.agenda-submit,
+.agenda-action,
+.student-schedule-submit,
+.student-contact-save,
+.training-player-action {
+  background: #000 !important;
+  color: #fff !important;
+  border: 1px solid var(--team-color) !important;
+}
+.btn-action:hover,
+.ui-button.btn:not(.back-navigation):hover,
+.agenda-submit:hover {
+  background: #151515 !important;
+  color: #fff !important;
+  border-color: var(--team-color) !important;
+}
+.back-navigation,
+.text-btn,
+.calendar-arrow {
+  background: #000 !important;
+  color: #fff !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.menu-button,
+.menu-close,
+.side-link {
+  border-color: initial;
+}
+.payment-chevron,
+.student-workout-summary-chevron,
+.workout-slide-summary-chevron,
+.evaluation-student-arrow {
+  border-right-color: var(--team-color) !important;
+  border-bottom-color: var(--team-color) !important;
+}
+.calendar-arrow {
+  color: var(--team-color) !important;
+}
 
+.workout-editor-close,
+.workout-editor-close:hover,
+.workout-editor-close:focus {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: #000 !important;
+  color: #fff !important;
+}
+.training-player-title {
+  font-size: clamp(34px, 8vw, 54px) !important;
+  font-weight: 800;
+  line-height: 1.1;
+}
+.side-icon svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+}
 
-button:not(.menu-button):not(.menu-close):not(.side-link):not(.back-navigation):not(.text-btn):not(.calendar-arrow):not(.student-workout-summary):not(.payment-student-toggle):not(.student-nav-button):not(.student-calendar-button):not(.student-payment-button):not(.student-workout-summary):not(.forgot-link) { background:#000; color:#fff; }
-.btn-action,.ui-button.btn:not(.back-navigation):not(.student-nav-button),.agenda-submit,.agenda-action,.student-schedule-submit,.student-contact-save,.training-player-action { background:#000!important; color:#fff!important; border:1px solid var(--team-color)!important; }
-.btn-action:hover,.ui-button.btn:not(.back-navigation):hover,.agenda-submit:hover { background:#151515!important; color:#fff!important; border-color:var(--team-color)!important; }
-.back-navigation,.text-btn,.calendar-arrow { background:#000!important; color:#fff!important; border:0!important; box-shadow:none!important; }
-.menu-button,.menu-close,.side-link { border-color:initial; }
-.payment-chevron,.student-workout-summary-chevron,.workout-slide-summary-chevron,.evaluation-student-arrow { border-right-color:var(--team-color)!important; border-bottom-color:var(--team-color)!important; }
-.calendar-arrow { color:var(--team-color)!important; }
+.side-nav .side-link,
+.sidebar .side-link,
+.sidebar .side-link.active,
+.sidebar .side-link.logout {
+  border: 0 !important;
+  box-shadow: none !important;
+  outline-offset: 3px;
+}
+.side-link:focus-visible {
+  outline: 2px solid var(--team-color);
+}
+.profile-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 18px 0 26px;
+}
+.profile-stats > div {
+  border: 1px solid #333;
+  border-radius: 12px;
+  padding: 16px 5px;
+  text-align: center;
+}
+.profile-stats strong {
+  display: block;
+  font-size: 28px;
+  color: var(--team-color);
+}
+.profile-stats span {
+  font-size: 12px;
+}
+.profile-whatsapp {
+  display: inline-block;
+  margin: 12px 0;
+  color: var(--team-color);
+}
+.profile-load-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  min-height: 175px;
+  overflow-x: auto;
+  padding: 16px 0;
+}
+.profile-load-column {
+  min-width: 45px;
+  text-align: center;
+  font-size: 11px;
+}
+.profile-load-column > div {
+  background: var(--team-color);
+  border-radius: 6px 6px 0 0;
+}
+.workout-exercise-row {
+  padding: 16px 4px;
+  border-bottom: 1px solid #333;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.workout-exercise-row small {
+  width: 100%;
+  color: #aaa;
+}
+.training-series-pills {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin: 18px;
+}
+.training-series-pills span {
+  background: #202020;
+  border-radius: 30px;
+  padding: 10px 16px;
+}
+.training-series-pills .selected {
+  outline: 2px solid var(--team-color);
+}
+.training-player-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.training-player-fields label {
+  min-width: 0;
+  text-align: center;
+}
+.training-player-fields input {
+  width: 100%;
+  min-width: 0;
+}
+.training-player-navigation {
+  display: flex;
+  justify-content: space-between;
+  margin: 18px 0;
+}
+.training-player-navigation button {
+  background: transparent;
+  color: white;
+  border: 0;
+  padding: 10px;
+}
+.training-player-navigation button:disabled {
+  opacity: 0.3;
+}
 
-.workout-editor-close,.workout-editor-close:hover,.workout-editor-close:focus{border:0!important;box-shadow:none!important;background:#000!important;color:#fff!important}
-.training-player-title{font-size:clamp(34px,8vw,54px)!important;font-weight:800;line-height:1.1}
-.side-icon svg{display:block;width:24px;height:24px;fill:currentColor}
+.workout-notifications {
+  position: fixed;
+  top: 75px;
+  right: 12px;
+  z-index: 9999;
+  max-width: min(370px, calc(100vw - 24px));
+}
+.workout-notification {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  background: #181818;
+  color: #fff;
+  border: 1px solid var(--team-color);
+  padding: 14px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 4px 20px #0009;
+}
+.workout-notification button {
+  background: transparent;
+  border: 0;
+  color: white;
+  font-size: 22px;
+}
+
+:root {
+  --accent: var(--team-color);
+}
+.chart .bar,
+.profile-load-column > div {
+  background: var(--team-color) !important;
+}
+.accent,
+.auth-card .page-heading.accent {
+  color: var(--team-color) !important;
+}
+.calendar-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 16px 2px;
+  color: #ddd;
+  font-size: 13px;
+}
+.calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.calendar-legend .lesson-dot {
+  flex-shrink: 0;
+}
+.weight-chart-section {
+  min-width: 0;
+  margin: 18px 0;
+}
+.weight-chart-section h3 {
+  margin: 0 0 8px;
+}
+.weight-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  min-height: 235px;
+  overflow-x: auto;
+  padding: 20px 4px 8px;
+  border-bottom: 1px solid #444;
+}
+.weight-chart-column {
+  background: transparent !important;
+  border: 0 !important;
+  color: #fff !important;
+  min-width: 57px;
+  flex: 1;
+  max-width: 105px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 7px;
+  padding: 0 0 5px;
+  cursor: pointer;
+  font: inherit;
+}
+.weight-chart-bar {
+  display: block;
+  width: 100%;
+  min-height: 8px;
+  background: var(--team-color);
+  border-radius: 7px 7px 2px 2px;
+  transition: filter 0.2s;
+}
+.weight-chart-column:hover .weight-chart-bar,
+.weight-chart-column.selected .weight-chart-bar {
+  filter: brightness(1.2);
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+.weight-chart-value {
+  min-height: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--team-color);
+}
+.weight-chart-date {
+  font-size: 12px;
+  color: #ddd;
+  white-space: nowrap;
+}
+.weight-chart-column:focus-visible {
+  outline: 2px solid var(--team-color);
+  outline-offset: 3px;
+}
+
+.workout-management .payment-student {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+.workout-management .payment-student-content {
+  padding: 10px 0 !important;
+}
+.nome-aluno-treinos {
+  font-size: clamp(23px, 5vw, 32px);
+  font-weight: 800;
+  letter-spacing: 0.015em;
+}
+.adicionar-treino,
+.workout-save-button,
+.workout-add-exercise {
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 19px;
+  padding: 12px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.adicionar-treino,
+.workout-save-button {
+  border: 1px solid var(--team-color);
+  background: transparent;
+  color: #fff;
+}
+.workout-add-exercise {
+  background: #191919;
+  color: var(--team-color);
+  border: 0;
+}
+.workout-editor-surface {
+  margin: 20px 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.workout-editor-toolbar {
+  display: flex;
+  justify-content: flex-end;
+}
+.workout-editor-close,
+.exercise-remove-button,
+.exercise-media-remove,
+.exercise-media-dialog-close {
+  border: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  padding: 10px 2px;
+  cursor: pointer;
+  font-family: "Bebas Neue", sans-serif;
+  font-size: 17px;
+}
+.workout-editor-form {
+  display: grid;
+  gap: 16px;
+}
+.workout-title-label,
+.workout-periodization-label,
+.exercise-name-label,
+.exercise-sets-label,
+.exercise-note-label,
+.exercise-media-label {
+  display: grid;
+  gap: 7px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+.workout-title-input,
+.workout-periodization-input,
+.exercise-name-input,
+.exercise-sets-input,
+.exercise-note-input,
+.exercise-media-input {
+  width: 100%;
+  max-width: 100%;
+  padding: 13px 12px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  background: #090909;
+  color: #fff;
+  font: inherit;
+}
+.exercise-edit {
+  padding: 17px 0 !important;
+  border: 0 !important;
+  border-top: 1px solid #393939 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  display: grid;
+  gap: 12px;
+}
+.exercise-edit-heading {
+  font-size: 19px;
+}
+.exercise-view-media {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  padding: 9px 14px;
+  border-radius: 30px;
+  border: 1px solid var(--team-color);
+  color: var(--team-color);
+  background: transparent;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 8px 0;
+}
+.exercise-media-dialog {
+  width: min(94vw, 680px);
+  max-height: 85vh;
+  background: #101010;
+  color: white;
+  border: 1px solid #444;
+  border-radius: 16px;
+  padding: 16px;
+}
+.exercise-media-dialog::backdrop {
+  background: #000c;
+}
+.exercise-media-dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+.exercise-media-dialog img,
+.exercise-media-dialog video {
+  width: 100%;
+  max-height: 65vh;
+  object-fit: contain;
+}
+.exercise-media-preview {
+  color: var(--team-color);
+  font-size: 13px;
+}
+
+.evaluation-load-chart-section {
+  margin-top: 18px;
+  max-width: 100%;
+  overflow: hidden;
+}
+.evaluation-load-chart-title {
+  font-family: "Bebas Neue", Arial, sans-serif;
+  font-size: 25px;
+  margin: 0 0 12px;
+}
+.evaluation-load-bars {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+  overflow-x: auto;
+  min-height: 215px;
+  padding: 10px 4px 8px;
+  border-bottom: 1px solid #444;
+}
+.evaluation-load-column {
+  display: flex;
+  flex: 0 0 55px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  min-height: 185px;
+}
+.evaluation-load-value {
+  font:
+    700 13px Arial,
+    sans-serif;
+  color: #fff;
+  white-space: nowrap;
+}
+.evaluation-load-bar {
+  width: 44px;
+  max-width: 100%;
+  background: var(--team-color);
+  border-radius: 6px 6px 0 0;
+}
+.evaluation-load-date {
+  font:
+    12px Arial,
+    sans-serif;
+  color: #bbb;
+  white-space: nowrap;
+}
+
+.workout-management .payment-student {
+  border: 1px solid #505050 !important;
+  border-radius: 12px !important;
+  background: #000 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+.workout-management .payment-student-toggle {
+  padding: 14px !important;
+  min-height: 52px;
+}
+.workout-management .nome-aluno-treinos,
+.payment-page:not(.workout-management)
+  .payment-student-toggle
+  > span:first-child {
+  font-family: "Bebas Neue", Arial, sans-serif !important;
+  font-size: 25px !important;
+  line-height: 1.1;
+  font-weight: 400;
+}
+.workout-management .adicionar-treino {
+  border: 0 !important;
+  background: transparent !important;
+  color: #fff !important;
+  padding-left: 0;
+}
+.workout-management .workout-add-exercise {
+  border: 1px solid var(--team-color) !important;
+  background: #000 !important;
+  color: #fff !important;
+}
+
+.workout-management .workout-editor-form {
+  font-size: 100%;
+  gap: 14.4px;
+  padding: 18px;
+}
+.workout-management .workout-editor-form .workout-title-label,
+.workout-management .workout-editor-form .workout-periodization-label,
+.workout-management .workout-editor-form .exercise-name-label,
+.workout-management .workout-editor-form .exercise-sets-label,
+.workout-management .workout-editor-form .exercise-note-label,
+.workout-management .workout-editor-form .exercise-media-label {
+  font-size: 14px;
+  gap: 6.3px;
+}
+.workout-management .workout-editor-form .workout-title-input,
+.workout-management .workout-editor-form .workout-periodization-input,
+.workout-management .workout-editor-form .exercise-name-input,
+.workout-management .workout-editor-form .exercise-sets-input,
+.workout-management .workout-editor-form .exercise-note-input,
+.workout-management .workout-editor-form .exercise-media-input {
+  padding: 13px 12px;
+  border-radius: 10px;
+  font-size: 1rem;
+  min-height: 44px;
+}
+.workout-management .workout-editor-form .exercise-edit {
+  gap: 10.8px;
+  padding: 17px 0 !important;
+}
+.workout-management .workout-editor-form .exercise-edit-heading {
+  font-size: 19px;
+}
+.workout-management .workout-editor-form .workout-save-button,
+.workout-management .workout-editor-form .workout-add-exercise {
+  font-size: 19px;
+  padding: 12px 18px;
+  min-height: 44px;
+}
+.student-profile-welcome {
+  font-family: "Bebas Neue", Arial, sans-serif;
+}
+.evaluation-panel {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+  border-radius: 0 !important;
+}
+.evaluation-student {
+  border: 1px solid #505050 !important;
+  background: #000;
+  border-radius: 12px;
+}
+.evaluation-student-toggle {
+  font-family: "Bebas Neue", Arial, sans-serif !important;
+  font-size: 25px !important;
+  min-height: 52px;
+}
+
+.workout-management .nome-aluno-treinos {
+  display: inline-block;
+  margin: 4px 0 6px;
+}
+.workout-management .adicionar-treino {
+  margin: 0px 12px 0px;
+}
+
+.workout-management .workout-editor-close {
+  margin: 4px 0 8px;
+}
+.workout-management .workout-editor-form .workout-title-label,
+.workout-management .workout-editor-form .workout-periodization-label,
+.workout-management .workout-editor-form .exercise-name-label,
+.workout-management .workout-editor-form .exercise-sets-label,
+.workout-management .workout-editor-form .exercise-note-label,
+.workout-management .workout-editor-form .exercise-media-label,
+.workout-management .workout-editor-form .exercise-edit-heading {
+  font-family: "Bebas Neue", Arial, sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.workout-management .workout-editor-form #exerciseEditor {
+  display: grid;
+  gap: 6px;
+}
+.workout-management .workout-editor-form .exercise-edit {
+  gap: 12px;
+  margin: 25px 0 !important;
+  padding: 11px 0 !important;
+}
+.workout-management .workout-editor-form .exercise-edit .exercise-name-label,
+.workout-management .workout-editor-form .exercise-edit .exercise-sets-label,
+.workout-management .workout-editor-form .exercise-edit .exercise-note-label,
+.workout-management .workout-editor-form .exercise-edit .exercise-media-label {
+  gap: 4px;
+  margin: 0;
+}
+.workout-management .workout-editor-form .exercise-edit .exercise-media-preview,
+.workout-management
+  .workout-editor-form
+  .exercise-edit
+  .exercise-remove-button {
+  margin: 2px 0;
+}
+
+.workout-management .student-workout-summary {
+  margin: 0 0 10px !important;
+}
+.workout-management .workout-item-content {
+  padding: 12px 14px 14px !important;
+}
+
+.workout-management .workout-item-content .btn-action,
+.workout-management .workout-item-content .ui-button,
+.workout-management .student-workout-editor .btn-action {
+  margin: 10px 8px 8px 0 !important;
+}
+
+.workout-management .adicionar-treino {
+  border: 0 !important;
+}
+
+.workout-management .workout-editor-close {
+  margin: 8px 6px 12px !important;
+  border: 0 !important;
+}
+
+.workout-management .exercise-remove-button,
+.workout-management .exercise-media-remove {
+  margin: 8px 8px 10px 0 !important;
+}
+
+.workout-management .payment-student-toggle .payment-chevron,
+.payment-page:not(.workout-management) .payment-student-toggle .payment-chevron {
+  display: inline-block;
+  flex: 0 0 10px;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid var(--team-color);
+  border-bottom: 2px solid var(--team-color);
+  transform: rotate(45deg);
+  transition: transform .2s ease;
+  margin-right: 5px;
+}
+.workout-management .payment-student[open] > .payment-student-toggle .payment-chevron,
+.payment-page:not(.workout-management) .payment-student[open] > .payment-student-toggle .payment-chevron {
+  transform: rotate(225deg);
+}
+.workout-management .workout-editor-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 14px 12px 16px;
+}
+.workout-management .workout-editor-actions .adicionar-treino,
+.workout-management .workout-editor-actions .workout-editor-close {
+  margin: 0 !important;
+}
+.workout-management .workout-editor-actions .workout-editor-close {
+  margin-left: auto !important;
+}
+.workout-management .workout-editor-actions [hidden] {
+  display: none !important;
+}

@@ -1,7 +1,6 @@
 $ErrorActionPreference = "Stop"
 Set-Location "$PSScriptRoot\backend"
 
-# Desenvolvimento local usa SQLite. Evita herdar DATABASE_URL/Neon do sistema.
 Remove-Item Env:DATABASE_URL -ErrorAction SilentlyContinue
 
 if (-not (Test-Path ".venv\Scripts\python.exe")) {

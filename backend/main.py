@@ -143,6 +143,14 @@ class WorkoutSet(Base):
     load_kg = Column(Float)
     performed_at = Column(DateTime, default=datetime.utcnow)
 
+class WorkoutNotification(Base):
+    __tablename__ = "workout_notifications"
+    id = Column(Integer, primary_key=True)
+    student_id = Column(Integer, ForeignKey("users.id"), index=True)
+    message = Column(String)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    read = Column(Boolean, default=False)
+
 Base.metadata.create_all(engine)
 from sqlalchemy import inspect, text as sql_text
 with engine.begin() as conn:
@@ -270,7 +278,7 @@ class BrandingIn(BaseModel):
 @app.get("/api/branding")
 def get_branding(u=Depends(me), s: Session = Depends(db)):
     owner = u if u.role != "student" else s.get(User, u.professor_id)
-    return {"color": owner.theme_color or "#65f6d2", "logo": owner.brand_logo, "professor": owner.name, "phone": owner.phone or ""} if owner else {"color":"#65f6d2","logo":None,"professor":"","phone":""}
+    return {"color": owner.theme_color or "#65f6d2", "logo": None, "professor": owner.name, "phone": owner.phone or ""} if owner else {"color":"#65f6d2","logo":None,"professor":"","phone":""}
 
 
 @app.put("/api/branding")
@@ -282,7 +290,7 @@ def put_branding(x: BrandingIn, u=Depends(me), s: Session = Depends(db)):
     if x.logo and (len(x.logo) > 1400000 or not re.match(r"^data:image/(png|jpeg|webp);base64,", x.logo)):
         raise HTTPException(422, "Imagem inválida")
     u.theme_color = x.color
-    u.brand_logo = x.logo
+    u.brand_logo = None
     if x.phone is not None: u.phone = x.phone
     s.commit()
     return {"ok":True}
@@ -367,6 +375,24 @@ def login(f: OAuth2PasswordRequestForm = Depends(), s: Session = Depends(db)):
 def profile(u=Depends(me)):
     return {"id": u.id, "name": u.name, "username": u.username, "role": u.role, "email":u.email, "phone":u.phone, "contact_pending":bool(u.contact_pending)}
 
+
+@app.get("/api/me/dashboard")
+def student_dashboard(u=Depends(me), s: Session = Depends(db)):
+    today = date.today()
+    dates = [x.completed_at.date() for x in s.query(Completion).filter(Completion.student_id == u.id).all()]
+    week_start = today - timedelta(days=today.weekday())
+    loads = s.query(WorkoutSet).filter(WorkoutSet.student_id == u.id).order_by(WorkoutSet.performed_at.desc()).limit(12).all()
+    return {"week":sum(d >= week_start for d in dates), "month":sum(d.year == today.year and d.month == today.month for d in dates), "year":sum(d.year == today.year for d in dates), "loads":[{"load_kg":x.load_kg,"exercise_name":x.exercise_name,"performed_at":x.performed_at.isoformat()} for x in reversed(loads)]}
+
+@app.get("/api/me/notifications")
+def notifications(u=Depends(me), s: Session = Depends(db)):
+    return [{"id":n.id,"message":n.message} for n in s.query(WorkoutNotification).filter_by(student_id=u.id,read=False).order_by(WorkoutNotification.id.desc()).limit(20).all()]
+
+@app.post("/api/me/notifications/{nid}/read")
+def mark_notification(nid:int,u=Depends(me),s:Session=Depends(db)):
+    n=s.query(WorkoutNotification).filter_by(id=nid,student_id=u.id).first()
+    if not n: raise HTTPException(404)
+    n.read=True;s.commit();return {"ok":True}
 
 @app.get("/api/students")
 def students(u=Depends(me), s: Session = Depends(db)):
@@ -505,6 +531,7 @@ def save_workout(x: WorkoutIn, u=Depends(me), s: Session = Depends(db)):
     w = Workout(professor_id=u.id, **x.model_dump())
     s.add(w)
     s.commit()
+    s.add(WorkoutNotification(student_id=x.student_id,message=f"Novo treino disponível: {w.title}"));s.commit()
     return {"id": w.id}
 
 
@@ -516,6 +543,7 @@ def edit_workout(wid: int, x: WorkoutIn, u=Depends(me), s: Session = Depends(db)
     if not w or (u.role!="admin" and w.professor_id!=u.id): raise HTTPException(404)
     if not st or (u.role!="admin" and st.professor_id!=u.id): raise HTTPException(403)
     w.student_id=x.student_id;w.title=x.title;w.content=x.content;w.periodization=x.periodization;w.updated_at=datetime.utcnow()
+    s.add(WorkoutNotification(student_id=x.student_id,message=f"Treino atualizado: {w.title}"))
     s.commit()
     return {"ok":True}
 
@@ -746,4 +774,34 @@ def record_set(x:SetEntry,u=Depends(me),s:Session=Depends(db)):
 def workout_sets(wid:int,u=Depends(me),s:Session=Depends(db)):
     w=s.get(Workout,wid)
     if not w or (u.id!=w.student_id and u.id!=w.professor_id):raise HTTPException(404)
-    return [{"exercise_key":x.exercise_key,"set_number":x.set_number,"load_kg":x.load_kg,"performed_at":x.performed_at.isoformat()} for x in s.query(WorkoutSet).filter_by(workout_id=wid,student_id=w.student_id).order_by(WorkoutSet.performed_at).all()]
+    return [{"exercise_key":x.exercise_key,"exercise_name":x.exercise_name,"set_number":x.set_number,"load_kg":x.load_kg,"performed_at":x.performed_at.isoformat()} for x in s.query(WorkoutSet).filter_by(workout_id=wid,student_id=w.student_id).order_by(WorkoutSet.performed_at).all()]
+
+# Arquivos de exercícios: armazenamento persistente no banco (compatível com hospedagem efêmera).
+from fastapi.responses import Response
+class ExerciseMedia(Base):
+    __tablename__ = 'exercise_media'
+    id = Column(String, primary_key=True)
+    professor_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    mime = Column(String, nullable=False)
+    payload = Column(Text, nullable=False)
+
+Base.metadata.create_all(bind=engine)
+
+@app.post('/api/exercise-media')
+async def upload_exercise_media(file: UploadFile = File(...), u=Depends(me), s: Session=Depends(db)):
+    if u.role != 'professor': raise HTTPException(403, 'Somente professores podem enviar mídias')
+    allowed = {'image/jpeg':'.jpg','image/png':'.png','image/webp':'.webp','video/mp4':'.mp4','video/webm':'.webm'}
+    if file.content_type not in allowed: raise HTTPException(400,'Formato não permitido')
+    data = await file.read(12*1024*1024+1)
+    if not data or len(data)>12*1024*1024: raise HTTPException(400,'Arquivo vazio ou maior que 12 MB')
+    key = uuid.uuid4().hex + allowed[file.content_type]
+    s.add(ExerciseMedia(id=key, professor_id=u.id, mime=file.content_type, payload=base64.b64encode(data).decode('ascii')))
+    s.commit()
+    return {'url':'/api/exercise-media/'+key}
+
+@app.get('/api/exercise-media/{key}')
+def read_exercise_media(key:str,s:Session=Depends(db)):
+    # URLs aleatórias não enumeráveis; evitar divulgar os endereços fora dos treinos.
+    row=s.get(ExerciseMedia,key)
+    if not row: raise HTTPException(404)
+    return Response(content=base64.b64decode(row.payload),media_type=row.mime,headers={'Cache-Control':'private, max-age=3600','X-Content-Type-Options':'nosniff'})
