@@ -1,4 +1,5 @@
-import os, uuid, base64, json, calendar
+from sqlalchemy import func
+import os, uuid, base64, json, calendar, re
 from datetime import datetime, timedelta, date
 from typing import Optional, List
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File
@@ -314,10 +315,12 @@ def register(x: RegisterIn, s: Session = Depends(db)):
         raise HTTPException(403, "Código de acesso inválido")
     if x.role not in ("professor", "student"):
         raise HTTPException(400, "Tipo de conta inválido")
-    username = x.username.strip().lower()
+    if not x.phone or not re.fullmatch(r"[0-9]{11}", x.phone.strip()):
+        raise HTTPException(400, "Informe WhatsApp com DDD e 9 dígitos, sem espaços")
+    username = x.username.strip().casefold()
     if len(x.password) < 5:
         raise HTTPException(400, "A senha deve ter pelo menos 5 caracteres")
-    if s.query(User).filter(User.username == username).first():
+    if s.query(User).filter(func.lower(User.username) == username).first():
         raise HTTPException(409, "Usuário já existe")
     professor_id = None
     if x.role == "student":
@@ -350,8 +353,8 @@ def reset_password(x: ResetPasswordIn, s: Session = Depends(db)):
         raise HTTPException(403, "Código Dante inválido")
     if len(x.new_password) < 5:
         raise HTTPException(400, "A nova senha deve ter pelo menos 5 caracteres")
-    username = x.username.strip().lower()
-    u = s.query(User).filter(User.username == username, User.active == True).first()
+    username = x.username.strip().casefold()
+    u = s.query(User).filter(func.lower(User.username) == username, User.active == True).first()
     if not u:
         raise HTTPException(404, "Usuário não encontrado")
     u.password_hash = pwd.hash(x.new_password)
@@ -361,7 +364,7 @@ def reset_password(x: ResetPasswordIn, s: Session = Depends(db)):
 
 @app.post("/api/login")
 def login(f: OAuth2PasswordRequestForm = Depends(), s: Session = Depends(db)):
-    u = s.query(User).filter(User.username == f.username).first()
+    u = s.query(User).filter(func.lower(User.username) == f.username.strip().casefold()).first()
     if not u or not pwd.verify(f.password, u.password_hash):
         raise HTTPException(401, "Usuário ou senha inválidos")
     return {
@@ -417,13 +420,15 @@ def students(u=Depends(me), s: Session = Depends(db)):
 @app.post("/api/students")
 def add_student(x: StudentIn, u=Depends(me), s: Session = Depends(db)):
     allow_prof(u)
+    if not x.phone or not re.fullmatch(r"[0-9]{11}", x.phone.strip()):
+        raise HTTPException(400, "Informe WhatsApp com DDD e 9 dígitos, sem espaços")
     if len(x.password) < 5:
         raise HTTPException(400, "A senha deve ter pelo menos 5 caracteres")
-    if s.query(User).filter(User.username == x.username).first():
+    if s.query(User).filter(func.lower(User.username) == x.username.strip().casefold()).first():
         raise HTTPException(409, "Usuário já existe")
     st = User(
         name=x.name,
-        username=x.username,
+        username=x.username.strip().casefold(),
         password_hash=pwd.hash(x.password),
         role="student",
         professor_id=u.id,

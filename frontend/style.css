@@ -1328,7 +1328,6 @@
 .training-player-start,
 .training-player-finish,
 .training-player-check {
-  font-size: 90% !important;
   padding-block: 11px !important;
 }
 .student-calendar-panel .calendar-head {
@@ -2150,9 +2149,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   background: transparent !important;
   padding: 0 !important;
 }
-.workout-management .payment-student-content {
-  padding: 10px 0 !important;
-}
+
 .nome-aluno-treinos {
   font-size: clamp(23px, 5vw, 32px);
   font-weight: 800;
@@ -2198,7 +2195,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   padding: 10px 2px;
   cursor: pointer;
   font-family: "Bebas Neue", sans-serif;
-  font-size: 17px;
+  font-size: 19px;
 }
 .workout-editor-form {
   display: grid;
@@ -2471,7 +2468,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   .workout-editor-form
   .exercise-edit
   .exercise-remove-button {
-  margin: 2px 0;
+  margin: 20px 0 0;
 }
 
 .workout-management .student-workout-summary {
@@ -2494,11 +2491,6 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 .workout-management .workout-editor-close {
   margin: 8px 6px 12px !important;
   border: 0 !important;
-}
-
-.workout-management .exercise-remove-button,
-.workout-management .exercise-media-remove {
-  margin: 8px 8px 10px 0 !important;
 }
 
 .workout-management .payment-student-toggle .payment-chevron,
@@ -2533,4 +2525,501 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 }
 .workout-management .workout-editor-actions [hidden] {
   display: none !important;
+}
+
+.exercise-remove-button {border:1px solid var(--team-color)!important;border-radius:10px;padding:10px 16px;}
+.payment-student-content {padding-top:8px;}
+.workout-management .payment-student-toggle {margin-bottom:0;}
+.workout-management .payment-student-content {padding-top:6px;}
+.phone-required-label {font-family:Arial,sans-serif;font-size:17px;font-weight:700;}
+.profile-load-search-label {margin-top:14px;margin-bottom:14px;}
+.profile-load-column small {font:12px Arial,sans-serif;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.profile-latest {display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;}
+.profile-latest h3 {font:20px 'Bebas Neue',Arial,sans-serif;margin-bottom:10px;}
+.profile-latest-photo {width:100%;max-height:160px;object-fit:cover;border-radius:10px;}
+.professor-contact-list {margin-top:24px;}
+.professor-contact-row {display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #444;font:14px Arial,sans-serif;}
+
+
+
+.profile-load-column small{display:block;min-width:62px;max-width:none;font:12px Arial,sans-serif;color:#d6d6d6;white-space:nowrap;margin-top:7px}
+.profile-load-chart{gap:12px;padding:26px 0 12px;align-items:flex-end}
+.profile-load-column{min-width:62px;display:flex;flex-direction:column;align-items:center;justify-content:end;gap:4px}
+.profile-load-column > div{width:100%;min-width:44px;border-radius:9px 9px 2px 2px}
+.weight-chart-highlights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0 20px}
+.weight-chart-highlights > div{padding:13px 9px;background:#161616;border:1px solid #373737;border-radius:12px;min-width:0}
+.weight-chart-highlights span{display:block;font:12px Arial,sans-serif;color:#bcbcbc;margin-bottom:7px}
+.weight-chart-highlights strong{display:block;font:clamp(14px,3.3vw,19px) 'Bebas Neue',Arial,sans-serif;color:var(--team-color);overflow-wrap:anywhere}
+.weight-chart-value{color:#fff;min-height:18px;white-space:nowrap}
+.evaluation-photo-item{margin:0;min-width:0}
+.evaluation-photo-item figcaption{margin:7px 0 12px;text-align:center;font:13px Arial,sans-serif;color:#dadada}
+.student-create-surface{padding:14px 18px!important}
+.student-create-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 2px;background:transparent;border:0;color:#fff;text-align:left;font:25px 'Bebas Neue',Arial,sans-serif;cursor:pointer}
+.student-create-arrow{font:27px Arial,sans-serif;color:var(--team-color);transition:transform .2s}
+.student-create-toggle[aria-expanded='true'] .student-create-arrow{transform:rotate(180deg)}
+.student-create-body{padding:10px 0 4px}
+.student-create-body[hidden]{display:none!important}
+.workout-management .payment-student-content{padding-top:0!important}
+.workout-management .workout-list{margin-top:0!important}
+.workout-management .student-workout-entry{margin-top:4px!important;margin-bottom:8px!important}
+.workout-management .student-workout-summary{margin:0!important}
+.workout-management .payment-student-toggle{padding-bottom:10px!important}
+.workout-management .workout-editor-surface{margin:10px 0 20px!important;padding:0 5px!important}
+.workout-management .workout-editor-form{gap:19px!important;padding:20px 14px!important;border-top:1px solid #353535;background:linear-gradient(180deg,#111 0%,#050505 80%);border-radius:16px}
+.workout-management .workout-editor-form .exercise-edit{padding:18px 0 13px!important;gap:12px!important}
+.workout-management .workout-editor-form label{margin:0!important}
+.workout-management .workout-editor-form input,.workout-management .workout-editor-form textarea{border-radius:11px}
+.workout-management .workout-editor-form input:focus-visible,.workout-management .workout-editor-form textarea:focus-visible{outline:2px solid var(--team-color);outline-offset:1px}
+.workout-management .workout-add-exercise,.workout-management .workout-save-button{min-height:48px;border-radius:12px}
+.workout-management .workout-editor-actions{margin:12px 4px 14px!important;padding:3px 5px}
+.workout-management .student-workout-summary{padding:15px 12px!important}
+.workout-management .workout-item-content{padding:12px!important}
+.workout-links{display:grid;gap:14px}
+.workout-slide{border:1px solid #383838!important;border-radius:15px!important;background:linear-gradient(145deg,#171717,#070707)!important;overflow:hidden}
+.workout-slide-summary{padding:18px 16px!important}
+.workout-preview{padding:0 14px 12px}
+.workout-preview .row{background:#101010;border:0;border-bottom:1px solid #303030;padding:12px 8px}
+.training-player{max-width:620px;margin:auto;padding:14px clamp(12px,4vw,22px) 32px}
+.training-player-title{font-size:clamp(38px,9vw,62px);letter-spacing:.02em;margin:15px 0 26px}
+.training-player-stage{padding:0!important}
+.training-player-exercise{font-size:clamp(30px,7vw,46px);line-height:1.08;margin:22px 0 12px;text-align:center}
+.training-player-progress{display:flex;justify-content:space-between;font:14px 'Bebas Neue',Arial,sans-serif;letter-spacing:.08em;color:#ddd;margin-top:14px}
+.training-player-progress-track{height:5px;background:#292929;border-radius:8px;overflow:hidden;margin:9px 0 18px}
+.training-player-progress-track span{display:block;height:100%;background:var(--team-color);border-radius:8px;transition:width .25s}
+.training-player-modern{border:0;border-radius:20px;padding:18px 12px;background:0}
+.training-player-fields{gap:12px}
+.training-player-fields label{background:#1a1a1a;border-radius:14px;padding:12px 8px;text-align:center}
+.training-player-fields input{background:transparent;border:0;border-bottom:2px solid #444;border-radius:0;text-align:center;font-weight:bold;font-size:clamp(25px,7vw,40px);width:100%;max-width:100%}
+.training-player-fields input:focus{outline:none;border-bottom-color:var(--team-color)}
+.training-player-check{width:100%;min-height:48px;border-radius:12px;margin-top:16px}
+.training-player-navigation{margin:16px 0;gap:12px}
+.training-player-navigation button{border:1px solid #444;border-radius:12px;min-height:44px}
+@media(max-width:420px){.weight-chart-highlights{gap:6px}.weight-chart-highlights>div{padding:10px 6px}.workout-management .workout-editor-form{padding:16px 10px!important}.training-player-fields{gap:8px}}
+
+
+.workout-management .workout-editor-surface {
+  background: transparent !important;
+  padding: 0 !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.workout-management .workout-editor-form {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 12px 10px 16px !important;
+}
+.workout-management .workout-editor-form .workout-title-input,
+.workout-management .workout-editor-form .workout-periodization-input,
+.workout-management .workout-editor-form .exercise-name-input,
+.workout-management .workout-editor-form .exercise-sets-input,
+.workout-management .workout-editor-form .exercise-note-input {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-bottom: 2px solid var(--team-color) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 12px 4px 8px !important;
+  outline: none !important;
+}
+.workout-management .workout-editor-form .workout-title-input:focus,
+.workout-management .workout-editor-form .workout-periodization-input:focus,
+.workout-management .workout-editor-form .exercise-name-input:focus,
+.workout-management .workout-editor-form .exercise-sets-input:focus,
+.workout-management .workout-editor-form .exercise-note-input:focus {
+  outline: none !important;
+  border-bottom-color: var(--team-color) !important;
+  box-shadow: 0 2px 0 -1px var(--team-color) !important;
+}
+.workout-management .workout-editor-form #exerciseEditor {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+.workout-management .workout-editor-form .exercise-edit {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  margin: 0 !important;
+  padding: 14px 0 0 !important;
+}
+.workout-management .workout-editor-form .exercise-edit:last-child {
+  padding-bottom: 0 !important;
+}
+.workout-management .workout-editor-form .exercise-remove-button,
+.workout-management .workout-editor-form .workout-add-exercise,
+.workout-management .workout-editor-form .workout-save-button {
+  display: block !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  box-sizing: border-box !important;
+  text-align: center !important;
+}
+.workout-management .workout-editor-form .exercise-remove-button {
+  border: 1px solid var(--team-color) !important;
+  border-radius: 11px !important;
+  min-height: 44px !important;
+}
+.workout-management .workout-editor-form #exerciseEditor + .workout-add-exercise {
+  margin-top: -12px !important;
+}
+.workout-management .workout-editor-form .workout-add-exercise {
+  background: #000 !important;
+  margin-bottom: 0 !important;
+}
+.workout-management .workout-editor-form .workout-save-button {
+  margin-top: 0 !important;
+}
+.workout-management .student-workout-summary {
+  padding-top: 7.5px !important;
+  padding-bottom: 7.5px !important;
+  min-height: 0 !important;
+}
+.student-create-toggle .student-create-arrow {
+  display: inline-block !important;
+  width: 10px !important;
+  height: 10px !important;
+  font-size: 0 !important;
+  border-right: 2px solid var(--team-color) !important;
+  border-bottom: 2px solid var(--team-color) !important;
+  transform: rotate(45deg) !important;
+  transition: transform .2s ease !important;
+  margin: 0 6px 5px 0 !important;
+}
+.student-create-toggle[aria-expanded="true"] .student-create-arrow {
+  transform: rotate(225deg) !important;
+  margin-bottom: 0 !important;
+}
+.workout-management .payment-student-toggle,
+.payment-page:not(.workout-management) .payment-student-toggle {
+  padding: 28px !important;
+  min-height: 56px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+.weight-chart-highlights {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 7px !important;
+  padding: 0 !important;
+  margin: 14px 0 20px !important;
+}
+.weight-chart-highlights .weight-summary-line {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: #fff;
+  font: 15px/1.5 Arial, sans-serif;
+}
+.weight-chart-highlights .weight-summary-line strong {
+  display: inline !important;
+  color: var(--team-color) !important;
+  font: 700 15px Arial, sans-serif !important;
+  margin-left: 5px;
+}
+.training-player {
+  gap: 7px !important;
+  padding: max(10px, env(safe-area-inset-top)) 14px max(12px, env(safe-area-inset-bottom)) !important;
+  justify-content: flex-start !important;
+}
+.training-player-back {font: 16px 'Bebas Neue',sans-serif !important; padding: 4px 0 !important;}
+.training-player-title {
+  margin: 0 !important;
+  font: 38px/1 'Bebas Neue',Arial,sans-serif !important;
+  text-transform: uppercase;
+}
+.training-player-timer {
+  margin: 0 !important;
+  display: flex !important;
+  gap: 10px !important;
+  justify-content: center !important;
+  align-items: baseline !important;
+  font: 13px Arial,sans-serif;
+}
+.training-player-timer-value {font: 700 21px Arial,sans-serif !important;}
+.training-player-stage {
+  flex: 0 1 auto !important;
+  justify-content: flex-start !important;
+  gap: 7px !important;
+  min-height: 0 !important;
+}
+.training-player-progress {margin: 5px 0 0 !important; gap: 8px; justify-content: center !important;}
+.training-player-progress-track {margin: 2px 0 4px !important; width: 100%;}
+.training-player-exercise {margin: 2px 0 4px !important;font: 30px/1.05 'Bebas Neue',Arial,sans-serif !important;}
+.training-player-note {margin: 0 !important;font-size: 13px !important;}
+.training-series-pills {margin: 6px 0 !important; gap: 8px !important;}
+.training-series-pills span {padding: 6px 12px !important;}
+.training-player-modern {padding: 10px !important; gap: 8px !important; border-radius: 15px !important;}
+.training-player-fields label {padding: 8px 6px !important; font: 12px Arial,sans-serif !important;}
+.training-player-fields input {padding: 6px 2px !important; font-size: 25px !important;}
+.training-player-check {margin-top: 6px !important;min-height: 42px !important;}
+.training-player-navigation {margin: 2px 0 !important; width: 100%;}
+.training-player-navigation button {min-height: 36px !important;}
+.training-player-start,.training-player-finish {padding: 8px 16px !important;min-height: 38px !important;}
+@media(max-height: 740px) {
+  .training-player {gap: 4px !important;}
+  .training-player-title {font-size: 32px !important;}
+  .training-player-exercise {font-size: 25px !important;}
+  .training-player-modern {padding: 7px !important;}
+}
+
+
+/* version 12 overrides */
+.workout-management .workout-editor-form .workout-title-label,
+.workout-management .workout-editor-form .workout-periodization-label,
+.workout-management .workout-editor-form .exercise-name-label,
+.workout-management .workout-editor-form .exercise-sets-label,
+.workout-management .workout-editor-form .exercise-note-label,
+.workout-management .workout-editor-form .exercise-media-label,
+.workout-management .workout-editor-form .exercise-edit-heading {
+  font-family: Arial, sans-serif !important;
+  font-weight: 700 !important;
+}
+.workout-management .workout-editor-form .workout-title-label,
+.workout-management .workout-editor-form .workout-periodization-label,
+.workout-management .workout-editor-form .exercise-name-label,
+.workout-management .workout-editor-form .exercise-sets-label,
+.workout-management .workout-editor-form .exercise-note-label,
+.workout-management .workout-editor-form .exercise-media-label {
+  gap: 3px !important;
+  font-size: 22px !important;
+}
+.workout-management .workout-editor-form .exercise-edit-heading {
+  font-size: 24px !important;
+  margin-bottom: 2px !important;
+}
+.workout-management .workout-editor-form .workout-title-input,
+.workout-management .workout-editor-form .workout-periodization-input,
+.workout-management .workout-editor-form .exercise-name-input,
+.workout-management .workout-editor-form .exercise-sets-input,
+.workout-management .workout-editor-form .exercise-note-input {
+  font-family: Arial, sans-serif !important;
+  font-size: 18px !important;
+}
+.workout-management .payment-student-toggle,
+.payment-page:not(.workout-management) .payment-student-toggle,
+.workout-slide-summary {
+  padding: 28px !important;
+  min-height: 56px !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+.workout-slide {
+  border: 1px solid #505050 !important;
+  border-radius: 12px !important;
+  background: #000 !important;
+  overflow: hidden !important;
+}
+.workout-slide-summary-label,
+.payment-student-toggle > span:first-child,
+.workout-management .nome-aluno-treinos {
+  font-family: "Bebas Neue", Arial, sans-serif !important;
+  font-size: 25px !important;
+  line-height: 1.05 !important;
+}
+.workout-preview {padding: 0 0 10px !important;}
+.workout-preview .row {padding: 12px 18px !important;}
+.student-create-toggle {
+  padding: 16px 18px !important;
+  min-height: 56px !important;
+  box-sizing: border-box !important;
+}
+.training-player-title,
+.training-player-progress,
+.training-player-exercise,
+.training-series-pills span,
+.training-player-start,
+.training-player-finish {
+    font-family: 'Bebas Neue', sans-serif;
+}
+.training-player-title {
+  font-size: clamp(26px, 7.5vw, 46px) !important;
+  letter-spacing: 0 !important;
+  text-align: center !important;
+  margin-bottom: 10px !important;
+}
+.training-player-progress,
+.training-player-progress-text {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 4px !important;
+  font: 700 17px/1.2 Arial, sans-serif !important;
+  margin: 0 !important;
+}
+.training-player-progress-track,
+.training-player-navigation {
+  display: none !important;
+}
+.training-player-stage {
+  display: flex !important;
+  flex-direction: column !important;
+  min-height: calc(100vh - 320px) !important;
+}
+.training-player-exercise {
+  font-size: clamp(22px, 6.5vw, 36px) !important;
+  margin: 10px 0 8px !important;
+}
+.training-player-modern {
+  margin-top: auto !important;
+  background: 0;
+  border: 0;
+}
+.training-player-fields {
+  margin-top: 2px !important;
+}
+.training-player-fields label,
+.training-player-fields input {
+  font-family: Arial, sans-serif !important;
+}
+.training-player-start,
+.training-player-finish,
+.training-player-check {
+  width: min(100%, 260px) !important;
+  align-self: center !important;
+  margin-top: 40px;
+}
+.training-player-finish {
+  margin-top: 10px !important;
+}
+.training-player-timer,
+.training-player-timer-footer {
+  margin-top: 12px !important;
+  text-align: center !important;
+}
+.training-player-timer-value {
+  display: block !important;
+  font: 700 clamp(30px, 8vw, 48px)/1 Arial, sans-serif !important;
+  color: #fff !important;
+}
+.weight-chart-highlights {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+.student-professor-contact {margin-top: 22px;}
+.student-professor-contact h3 {font: 22px "Bebas Neue", Arial, sans-serif; margin-bottom: 8px;}
+.professor-contact-name {
+  color: var(--team-color);
+  text-decoration: none;
+  font-weight: 700;
+}
+.professor-contact-name:hover {text-decoration: underline;}
+.profile-load-chart,
+.evaluation-load-bars,
+.weight-bar-chart,
+.load-bars {
+  overflow-x: auto;
+}
+
+
+.training-player-title,
+.training-player-progress,
+.training-player-exercise {
+  font-family: "Bebas Neue", Arial, sans-serif !important;
+  font-weight: 400 !important;
+}
+.training-player-title {
+  font-size: clamp(32px, 9vw, 52px) !important;
+}
+.training-player-exercise {
+  font-size: clamp(28px, 8vw, 42px) !important;
+}
+.training-player-progress,
+.training-player-progress-text {
+  font-family: "Bebas Neue", Arial, sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 19px !important;
+}
+.training-last-load {
+  color: #fff;
+  text-align: center;
+  margin: 6px 0 8px;
+  font: 14px/1.35 Arial, sans-serif;
+}
+.training-player-modern {
+  background: 0;
+  background-image: none !important;
+  border: 0;
+  box-shadow: none !important;
+  padding: 12px !important;
+}
+.training-player-fields label {
+  background: 0;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #fff !important;
+  font-family: Arial, sans-serif !important;
+  font-weight: 400 !important;
+  font-size: 12px !important;
+}
+.training-player-fields input {
+  background: 0;
+  border: 0 !important;
+  border-bottom: 2px solid var(--team-color) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: #fff !important;
+}
+.training-player-check {
+  display: block !important;
+  align-self: center !important;
+  width: min(100%, 260px) !important;
+  margin: 12px auto 0 !important;
+  text-align: center !important;
+}
+.training-player-cancel {
+  border-color: var(--team-color) !important;
+  color: #fff !important;
+}
+.workout-management .payment-student-toggle {
+  padding: 28px !important;
+  min-height: 62.25px !important;
+}
+.workout-management .workout-editor-form .workout-title-label,
+.workout-management .workout-editor-form .workout-periodization-label,
+.workout-management .workout-editor-form .exercise-name-label,
+.workout-management .workout-editor-form .exercise-sets-label,
+.workout-management .workout-editor-form .exercise-note-label,
+.workout-management .workout-editor-form .exercise-media-label {
+  font-family: Arial, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+}
+.workout-management .workout-editor-form .exercise-edit-heading {
+  font: 400 23px/1.2 "Bebas Neue", Arial, sans-serif !important;
+  text-transform: none !important;
+}
+.workout-management .workout-editor-form .workout-title-input,
+.workout-management .workout-editor-form .workout-periodization-input,
+.workout-management .workout-editor-form .exercise-name-input,
+.workout-management .workout-editor-form .exercise-sets-input,
+.workout-management .workout-editor-form .exercise-note-input {
+  font: 400 16px/1.3 Arial, sans-serif !important;
+  text-transform: none !important;
+}
+.workout-management .workout-editor-form .exercise-media-input {
+  font-family: Arial, sans-serif !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+}
+.workout-management .workout-editor-form #exerciseEditor + .workout-add-exercise {
+  margin-top: 12px !important;
 }
