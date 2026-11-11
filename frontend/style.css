@@ -1519,7 +1519,7 @@
   background: transparent;
   color: var(--text);
   border: 0;
-  padding: 15px;
+  padding: 25px;
   text-align: left;
   cursor: pointer;
   font-family: "Bebas Neue", sans-serif;
@@ -1621,7 +1621,7 @@
   width: 100%;
   flex-basis: 100%;
   margin-top: 14px;
-  padding: 14px 0 4px;
+  padding: 14px 8px;
   border-top: 1px solid var(--line);
 }
 .student-calendar-inline-header {
@@ -1820,7 +1820,6 @@ button:focus-visible {
   outline-offset: 2px;
 }
 .workout-management .student-workout-entry {
-  background: #080808;
   border: 0;
 }
 .workout-management .student-workout-summary {
@@ -2622,7 +2621,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   background: transparent !important;
   background-image: none !important;
   border: 0 !important;
-  border-bottom: 2px solid var(--team-color) !important;
+  border-bottom: 2px solid var(--line) !important;
   border-radius: 0 !important;
   box-shadow: none !important;
   padding: 12px 4px 8px !important;
@@ -2647,7 +2646,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   flex-direction: column !important;
   gap: 10px !important;
   margin: 0 !important;
-  padding: 14px 0 0 !important;
+  padding: 25px 0 0 !important;
 }
 .workout-management .workout-editor-form .exercise-edit:last-child {
   padding-bottom: 0 !important;
@@ -2699,7 +2698,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 }
 .workout-management .payment-student-toggle,
 .payment-page:not(.workout-management) .payment-student-toggle {
-  padding: 28px !important;
+  padding: 14px !important;
   min-height: 56px !important;
   box-sizing: border-box !important;
   display: flex !important;
@@ -2811,7 +2810,6 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 .workout-management .payment-student-toggle,
 .payment-page:not(.workout-management) .payment-student-toggle,
 .workout-slide-summary {
-  padding: 28px !important;
   min-height: 56px !important;
   box-sizing: border-box !important;
   display: flex !important;
@@ -3023,3 +3021,112 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 .workout-management .workout-editor-form #exerciseEditor + .workout-add-exercise {
   margin-top: 12px !important;
 }
+
+
+.phone-required-label {
+  font-family: Arial, sans-serif !important;
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0 !important;
+}
+.phone-required-label .phone-digits-note {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+.workout-management .payment-student-toggle,
+.payment-page:not(.workout-management) .payment-student-toggle,
+.evaluation-student-toggle {
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  min-height: 0 !important;
+  width: 100% !important;
+  line-height: 1.1 !important;
+}
+.workout-management .payment-student-toggle > span:first-child,
+.payment-page:not(.workout-management) .payment-student-toggle > span:first-child,
+.evaluation-student-name {
+  margin: 0 !important;
+  padding: 0 !important;
+  font: 400 25px/1.1 "Bebas Neue", Arial, sans-serif !important;
+}
+.workout-management .workout-editor-form .workout-title-label {
+  font: 400 23px/1.2 "Bebas Neue", Arial, sans-serif !important;
+  text-transform: none !important;
+  margin-bottom: 2px !important;
+}
+.professor-contact-name,
+.professor-contact-row > strong {
+  font-family: "Bebas Neue", Arial, sans-serif !important;
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  letter-spacing: .02em !important;
+}
+.developer-contact-link {
+  display: block;
+  margin: 22px auto 8px;
+  padding: 10px 8px;
+  color: var(--team-color);
+  font: 400 17px/1.3 "Bebas Neue", Arial, sans-serif;
+  text-align: center;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.developer-contact-link:focus-visible {
+  outline: 2px solid var(--team-color);
+  outline-offset: 3px;
+}
+
+.workout-management .payment-student {
+    border: none !important;
+    border-bottom: 1px solid var(--team-color) !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    margin-bottom: 20px !important;
+}
+
+.workout-management .payment-student-toggle {
+    border: none !important;
+    border-bottom: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+
+/* Contorno completo somente durante edição ou inclusão; mantém estado compacto. */
+.workout-management .payment-student:has(.student-workout-editor:not(:empty)),
+.payment-page:not(.workout-management) .payment-student[open],
+.evaluation-student:has(.evaluation-student-detail:not([hidden])) {
+  border: 1px solid var(--team-color) !important;
+  border-radius: 12px !important;
+  background: #030303 !important;
+}
+
+/* Estado compacto das listas de pagamentos e avaliação. */
+.payment-page:not(.workout-management) .payment-student:not([open]),
+.evaluation-student:not(:has(.evaluation-student-detail:not([hidden]))) {
+  border: 0 !important;
+  border-bottom: 1px solid var(--team-color) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+
+.workout-management .payment-student[open] {
+    border: 1px solid var(--team-color) !important;
+    border-radius: 12px !important;
+    overflow: hidden;
+}
+
+.workout-management .payment-student[open] > .payment-student-toggle {
+    border: 0 !important;
+}
+.training-player-session-actions {display:flex;align-items:stretch;justify-content:center;gap:12px;width:100%;max-width:420px;margin:32px auto 0;}
+.training-player-session-actions .training-player-start,.training-player-session-actions .training-player-finish {flex:1 1 0;min-width:0;width:auto !important;margin:0 !important;white-space:nowrap;font-size:clamp(12px,3vw,16px);}
+.training-series-pills .training-series-pill {background:#242424;color:#fff;border:1px solid transparent;border-radius:50%;min-width:38px;min-height:38px;cursor:pointer;font-family:inherit;}
+.training-series-pills .training-series-pill.selected {border:2px solid var(--team-color);}
+.training-series-pills .training-series-pill.completed:not(.selected) {border-color:var(--team-color);}
+
+.training-player-back, .training-player-back:hover, .training-player-back:focus { border: 0 !important; outline: none; box-shadow: none; background: transparent !important; }
+.training-player-session-actions .training-player-start, .training-player-session-actions .training-player-finish { font-size: clamp(18px, 4.5vw, 23px) !important; line-height: 1.2 !important; min-height: 48px !important; padding: 10px 8px !important; }
