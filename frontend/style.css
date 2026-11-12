@@ -2493,7 +2493,9 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 }
 
 .workout-management .payment-student-toggle .payment-chevron,
-.payment-page:not(.workout-management) .payment-student-toggle .payment-chevron {
+.payment-page:not(.workout-management)
+  .payment-student-toggle
+  .payment-chevron {
   display: inline-block;
   flex: 0 0 10px;
   width: 10px;
@@ -2501,11 +2503,17 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   border-right: 2px solid var(--team-color);
   border-bottom: 2px solid var(--team-color);
   transform: rotate(45deg);
-  transition: transform .2s ease;
+  transition: transform 0.2s ease;
   margin-right: 5px;
 }
-.workout-management .payment-student[open] > .payment-student-toggle .payment-chevron,
-.payment-page:not(.workout-management) .payment-student[open] > .payment-student-toggle .payment-chevron {
+.workout-management
+  .payment-student[open]
+  > .payment-student-toggle
+  .payment-chevron,
+.payment-page:not(.workout-management)
+  .payment-student[open]
+  > .payment-student-toggle
+  .payment-chevron {
   transform: rotate(225deg);
 }
 .workout-management .workout-editor-actions {
@@ -2526,75 +2534,365 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   display: none !important;
 }
 
-.exercise-remove-button {border:1px solid var(--team-color)!important;border-radius:10px;padding:10px 16px;}
-.payment-student-content {padding-top:8px;}
-.workout-management .payment-student-toggle {margin-bottom:0;}
-.workout-management .payment-student-content {padding-top:6px;}
-.phone-required-label {font-family:Arial,sans-serif;font-size:17px;font-weight:700;}
-.profile-load-search-label {margin-top:14px;margin-bottom:14px;}
-.profile-load-column small {font:12px Arial,sans-serif;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.profile-latest {display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:20px 0;}
-.profile-latest h3 {font:20px 'Bebas Neue',Arial,sans-serif;margin-bottom:10px;}
-.profile-latest-photo {width:100%;max-height:160px;object-fit:cover;border-radius:10px;}
-.professor-contact-list {margin-top:24px;}
-.professor-contact-row {display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #444;font:14px Arial,sans-serif;}
+.exercise-remove-button {
+  border: 1px solid var(--team-color) !important;
+  border-radius: 10px;
+  padding: 10px 16px;
+}
+.payment-student-content {
+  padding-top: 8px;
+}
+.workout-management .payment-student-toggle {
+  margin-bottom: 0;
+}
+.workout-management .payment-student-content {
+  padding-top: 6px;
+}
+.phone-required-label {
+  font-family: Arial, sans-serif;
+  font-size: 17px;
+  font-weight: 700;
+}
+.profile-load-search-label {
+  margin-top: 14px;
+  margin-bottom: 14px;
+}
+.profile-load-column small {
+  font:
+    12px Arial,
+    sans-serif;
+  max-width: 80px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.profile-latest {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin: 20px 0;
+}
+.profile-latest h3 {
+  font:
+    20px "Bebas Neue",
+    Arial,
+    sans-serif;
+  margin-bottom: 10px;
+}
+.profile-latest-photo {
+  width: 100%;
+  max-height: 160px;
+  object-fit: cover;
+  border-radius: 10px;
+}
+.professor-contact-list {
+  margin-top: 24px;
+}
+.professor-contact-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid #444;
+  font:
+    14px Arial,
+    sans-serif;
+}
 
-
-
-.profile-load-column small{display:block;min-width:62px;max-width:none;font:12px Arial,sans-serif;color:#d6d6d6;white-space:nowrap;margin-top:7px}
-.profile-load-chart{gap:12px;padding:26px 0 12px;align-items:flex-end}
-.profile-load-column{min-width:62px;display:flex;flex-direction:column;align-items:center;justify-content:end;gap:4px}
-.profile-load-column > div{width:100%;min-width:44px;border-radius:9px 9px 2px 2px}
-.weight-chart-highlights{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:18px 0 20px}
-.weight-chart-highlights > div{padding:13px 9px;background:#161616;border:1px solid #373737;border-radius:12px;min-width:0}
-.weight-chart-highlights span{display:block;font:12px Arial,sans-serif;color:#bcbcbc;margin-bottom:7px}
-.weight-chart-highlights strong{display:block;font:clamp(14px,3.3vw,19px) 'Bebas Neue',Arial,sans-serif;color:var(--team-color);overflow-wrap:anywhere}
-.weight-chart-value{color:#fff;min-height:18px;white-space:nowrap}
-.evaluation-photo-item{margin:0;min-width:0}
-.evaluation-photo-item figcaption{margin:7px 0 12px;text-align:center;font:13px Arial,sans-serif;color:#dadada}
-.student-create-surface{padding:14px 18px!important}
-.student-create-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:10px 2px;background:transparent;border:0;color:#fff;text-align:left;font:25px 'Bebas Neue',Arial,sans-serif;cursor:pointer}
-.student-create-arrow{font:27px Arial,sans-serif;color:var(--team-color);transition:transform .2s}
-.student-create-toggle[aria-expanded='true'] .student-create-arrow{transform:rotate(180deg)}
-.student-create-body{padding:10px 0 4px}
-.student-create-body[hidden]{display:none!important}
-.workout-management .payment-student-content{padding-top:0!important}
-.workout-management .workout-list{margin-top:0!important}
-.workout-management .student-workout-entry{margin-top:4px!important;margin-bottom:8px!important}
-.workout-management .student-workout-summary{margin:0!important}
-.workout-management .payment-student-toggle{padding-bottom:10px!important}
-.workout-management .workout-editor-surface{margin:10px 0 20px!important;padding:0 5px!important}
-.workout-management .workout-editor-form{gap:19px!important;padding:20px 14px!important;border-top:1px solid #353535;background:linear-gradient(180deg,#111 0%,#050505 80%);border-radius:16px}
-.workout-management .workout-editor-form .exercise-edit{padding:18px 0 13px!important;gap:12px!important}
-.workout-management .workout-editor-form label{margin:0!important}
-.workout-management .workout-editor-form input,.workout-management .workout-editor-form textarea{border-radius:11px}
-.workout-management .workout-editor-form input:focus-visible,.workout-management .workout-editor-form textarea:focus-visible{outline:2px solid var(--team-color);outline-offset:1px}
-.workout-management .workout-add-exercise,.workout-management .workout-save-button{min-height:48px;border-radius:12px}
-.workout-management .workout-editor-actions{margin:12px 4px 14px!important;padding:3px 5px}
-.workout-management .student-workout-summary{padding:15px 12px!important}
-.workout-management .workout-item-content{padding:12px!important}
-.workout-links{display:grid;gap:14px}
-.workout-slide{border:1px solid #383838!important;border-radius:15px!important;background:linear-gradient(145deg,#171717,#070707)!important;overflow:hidden}
-.workout-slide-summary{padding:18px 16px!important}
-.workout-preview{padding:0 14px 12px}
-.workout-preview .row{background:#101010;border:0;border-bottom:1px solid #303030;padding:12px 8px}
-.training-player{max-width:620px;margin:auto;padding:14px clamp(12px,4vw,22px) 32px}
-.training-player-title{font-size:clamp(38px,9vw,62px);letter-spacing:.02em;margin:15px 0 26px}
-.training-player-stage{padding:0!important}
-.training-player-exercise{font-size:clamp(30px,7vw,46px);line-height:1.08;margin:22px 0 12px;text-align:center}
-.training-player-progress{display:flex;justify-content:space-between;font:14px 'Bebas Neue',Arial,sans-serif;letter-spacing:.08em;color:#ddd;margin-top:14px}
-.training-player-progress-track{height:5px;background:#292929;border-radius:8px;overflow:hidden;margin:9px 0 18px}
-.training-player-progress-track span{display:block;height:100%;background:var(--team-color);border-radius:8px;transition:width .25s}
-.training-player-modern{border:0;border-radius:20px;padding:18px 12px;background:0}
-.training-player-fields{gap:12px}
-.training-player-fields label{background:#1a1a1a;border-radius:14px;padding:12px 8px;text-align:center}
-.training-player-fields input{background:transparent;border:0;border-bottom:2px solid #444;border-radius:0;text-align:center;font-weight:bold;font-size:clamp(25px,7vw,40px);width:100%;max-width:100%}
-.training-player-fields input:focus{outline:none;border-bottom-color:var(--team-color)}
-.training-player-check{width:100%;min-height:48px;border-radius:12px;margin-top:16px}
-.training-player-navigation{margin:16px 0;gap:12px}
-.training-player-navigation button{border:1px solid #444;border-radius:12px;min-height:44px}
-@media(max-width:420px){.weight-chart-highlights{gap:6px}.weight-chart-highlights>div{padding:10px 6px}.workout-management .workout-editor-form{padding:16px 10px!important}.training-player-fields{gap:8px}}
-
+.profile-load-column small {
+  display: block;
+  min-width: 62px;
+  max-width: none;
+  font:
+    12px Arial,
+    sans-serif;
+  color: #d6d6d6;
+  white-space: nowrap;
+  margin-top: 7px;
+}
+.profile-load-chart {
+  gap: 12px;
+  padding: 26px 0 12px;
+  align-items: flex-end;
+}
+.profile-load-column {
+  min-width: 62px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: end;
+  gap: 4px;
+}
+.profile-load-column > div {
+  width: 100%;
+  min-width: 44px;
+  border-radius: 9px 9px 2px 2px;
+}
+.weight-chart-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 18px 0 20px;
+}
+.weight-chart-highlights > div {
+  padding: 13px 9px;
+  background: #161616;
+  border: 1px solid #373737;
+  border-radius: 12px;
+  min-width: 0;
+}
+.weight-chart-highlights span {
+  display: block;
+  font:
+    12px Arial,
+    sans-serif;
+  color: #bcbcbc;
+  margin-bottom: 7px;
+}
+.weight-chart-highlights strong {
+  display: block;
+  font:
+    clamp(14px, 3.3vw, 19px) "Bebas Neue",
+    Arial,
+    sans-serif;
+  color: var(--team-color);
+  overflow-wrap: anywhere;
+}
+.weight-chart-value {
+  color: #fff;
+  min-height: 18px;
+  white-space: nowrap;
+}
+.evaluation-photo-item {
+  margin: 0;
+  min-width: 0;
+}
+.evaluation-photo-item figcaption {
+  margin: 7px 0 12px;
+  text-align: center;
+  font:
+    13px Arial,
+    sans-serif;
+  color: #dadada;
+}
+.student-create-surface {
+  padding: 14px 18px !important;
+}
+.student-create-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 2px;
+  background: transparent;
+  border: 0;
+  color: #fff;
+  text-align: left;
+  font:
+    25px "Bebas Neue",
+    Arial,
+    sans-serif;
+  cursor: pointer;
+}
+.student-create-arrow {
+  font:
+    27px Arial,
+    sans-serif;
+  color: var(--team-color);
+  transition: transform 0.2s;
+}
+.student-create-toggle[aria-expanded="true"] .student-create-arrow {
+  transform: rotate(180deg);
+}
+.student-create-body {
+  padding: 10px 0 4px;
+}
+.student-create-body[hidden] {
+  display: none !important;
+}
+.workout-management .payment-student-content {
+  padding-top: 0 !important;
+}
+.workout-management .workout-list {
+  margin-top: 0 !important;
+}
+.workout-management .student-workout-entry {
+  margin-top: 4px !important;
+  margin-bottom: 8px !important;
+}
+.workout-management .student-workout-summary {
+  margin: 0 !important;
+}
+.workout-management .payment-student-toggle {
+  padding-bottom: 10px !important;
+}
+.workout-management .workout-editor-surface {
+  margin: 10px 0 20px !important;
+  padding: 0 5px !important;
+}
+.workout-management .workout-editor-form {
+  gap: 19px !important;
+  padding: 20px 14px !important;
+  border-top: 1px solid #353535;
+  background: linear-gradient(180deg, #111 0%, #050505 80%);
+  border-radius: 16px;
+}
+.workout-management .workout-editor-form .exercise-edit {
+  padding: 18px 0 13px !important;
+  gap: 12px !important;
+}
+.workout-management .workout-editor-form label {
+  margin: 0 !important;
+}
+.workout-management .workout-editor-form input,
+.workout-management .workout-editor-form textarea {
+  border-radius: 11px;
+}
+.workout-management .workout-editor-form input:focus-visible,
+.workout-management .workout-editor-form textarea:focus-visible {
+  outline: 2px solid var(--team-color);
+  outline-offset: 1px;
+}
+.workout-management .workout-add-exercise,
+.workout-management .workout-save-button {
+  min-height: 48px;
+  border-radius: 12px;
+}
+.workout-management .workout-editor-actions {
+  margin: 12px 4px 14px !important;
+  padding: 3px 5px;
+}
+.workout-management .student-workout-summary {
+  padding: 15px 12px !important;
+}
+.workout-management .workout-item-content {
+  padding: 12px !important;
+}
+.workout-links {
+  display: grid;
+  gap: 14px;
+}
+.workout-slide {
+  border: 1px solid #383838 !important;
+  border-radius: 15px !important;
+  background: linear-gradient(145deg, #171717, #070707) !important;
+  overflow: hidden;
+}
+.workout-slide-summary {
+  padding: 18px 16px !important;
+}
+.workout-preview {
+  padding: 0 14px 12px;
+}
+.workout-preview .row {
+  background: #101010;
+  border: 0;
+  border-bottom: 1px solid #303030;
+  padding: 12px 8px;
+}
+.training-player {
+  max-width: 620px;
+  margin: auto;
+  padding: 14px clamp(12px, 4vw, 22px) 32px;
+}
+.training-player-title {
+  font-size: clamp(38px, 9vw, 62px);
+  letter-spacing: 0.02em;
+  margin: 15px 0 26px;
+}
+.training-player-stage {
+  padding: 0 !important;
+}
+.training-player-exercise {
+  font-size: clamp(30px, 7vw, 46px);
+  line-height: 1.08;
+  margin: 22px 0 12px;
+  text-align: center;
+}
+.training-player-progress {
+  display: flex;
+  justify-content: space-between;
+  font:
+    14px "Bebas Neue",
+    Arial,
+    sans-serif;
+  letter-spacing: 0.08em;
+  color: #ddd;
+  margin-top: 14px;
+}
+.training-player-progress-track {
+  height: 5px;
+  background: #292929;
+  border-radius: 8px;
+  overflow: hidden;
+  margin: 9px 0 18px;
+}
+.training-player-progress-track span {
+  display: block;
+  height: 100%;
+  background: var(--team-color);
+  border-radius: 8px;
+  transition: width 0.25s;
+}
+.training-player-modern {
+  border: 0;
+  border-radius: 20px;
+  padding: 18px 12px;
+  background: 0;
+}
+.training-player-fields {
+  gap: 12px;
+}
+.training-player-fields label {
+  background: #1a1a1a;
+  border-radius: 14px;
+  padding: 12px 8px;
+  text-align: center;
+}
+.training-player-fields input {
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid #444;
+  border-radius: 0;
+  text-align: center;
+  font-weight: bold;
+  font-size: clamp(25px, 7vw, 40px);
+  width: 100%;
+  max-width: 100%;
+}
+.training-player-fields input:focus {
+  outline: none;
+  border-bottom-color: var(--team-color);
+}
+.training-player-check {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 12px;
+  margin-top: 16px;
+}
+.training-player-navigation {
+  margin: 16px 0;
+  gap: 12px;
+}
+.training-player-navigation button {
+  border: 1px solid #444;
+  border-radius: 12px;
+  min-height: 44px;
+}
+@media (max-width: 420px) {
+  .weight-chart-highlights {
+    gap: 6px;
+  }
+  .weight-chart-highlights > div {
+    padding: 10px 6px;
+  }
+  .workout-management .workout-editor-form {
+    padding: 16px 10px !important;
+  }
+  .training-player-fields {
+    gap: 8px;
+  }
+}
 
 .workout-management .workout-editor-surface {
   background: transparent !important;
@@ -2666,7 +2964,10 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   border-radius: 11px !important;
   min-height: 44px !important;
 }
-.workout-management .workout-editor-form #exerciseEditor + .workout-add-exercise {
+.workout-management
+  .workout-editor-form
+  #exerciseEditor
+  + .workout-add-exercise {
   margin-top: -12px !important;
 }
 .workout-management .workout-editor-form .workout-add-exercise {
@@ -2689,7 +2990,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   border-right: 2px solid var(--team-color) !important;
   border-bottom: 2px solid var(--team-color) !important;
   transform: rotate(45deg) !important;
-  transition: transform .2s ease !important;
+  transition: transform 0.2s ease !important;
   margin: 0 6px 5px 0 !important;
 }
 .student-create-toggle[aria-expanded="true"] .student-create-arrow {
@@ -2720,23 +3021,36 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   border: 0 !important;
   border-radius: 0 !important;
   color: #fff;
-  font: 15px/1.5 Arial, sans-serif;
+  font:
+    15px/1.5 Arial,
+    sans-serif;
 }
 .weight-chart-highlights .weight-summary-line strong {
   display: inline !important;
   color: var(--team-color) !important;
-  font: 700 15px Arial, sans-serif !important;
+  font:
+    700 15px Arial,
+    sans-serif !important;
   margin-left: 5px;
 }
 .training-player {
   gap: 7px !important;
-  padding: max(10px, env(safe-area-inset-top)) 14px max(12px, env(safe-area-inset-bottom)) !important;
+  padding: max(10px, env(safe-area-inset-top)) 14px
+    max(12px, env(safe-area-inset-bottom)) !important;
   justify-content: flex-start !important;
 }
-.training-player-back {font: 16px 'Bebas Neue',sans-serif !important; padding: 4px 0 !important;}
+.training-player-back {
+  font:
+    16px "Bebas Neue",
+    sans-serif !important;
+  padding: 4px 0 !important;
+}
 .training-player-title {
   margin: 0 !important;
-  font: 38px/1 'Bebas Neue',Arial,sans-serif !important;
+  font:
+    38px/1 "Bebas Neue",
+    Arial,
+    sans-serif !important;
   text-transform: uppercase;
 }
 .training-player-timer {
@@ -2745,35 +3059,93 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   gap: 10px !important;
   justify-content: center !important;
   align-items: baseline !important;
-  font: 13px Arial,sans-serif;
+  font:
+    13px Arial,
+    sans-serif;
 }
-.training-player-timer-value {font: 700 21px Arial,sans-serif !important;}
+.training-player-timer-value {
+  font:
+    700 21px Arial,
+    sans-serif !important;
+}
 .training-player-stage {
   flex: 0 1 auto !important;
   justify-content: flex-start !important;
   gap: 7px !important;
   min-height: 0 !important;
 }
-.training-player-progress {margin: 5px 0 0 !important; gap: 8px; justify-content: center !important;}
-.training-player-progress-track {margin: 2px 0 4px !important; width: 100%;}
-.training-player-exercise {margin: 2px 0 4px !important;font: 30px/1.05 'Bebas Neue',Arial,sans-serif !important;}
-.training-player-note {margin: 0 !important;font-size: 13px !important;}
-.training-series-pills {margin: 6px 0 !important; gap: 8px !important;}
-.training-series-pills span {padding: 6px 12px !important;}
-.training-player-modern {padding: 10px !important; gap: 8px !important; border-radius: 15px !important;}
-.training-player-fields label {padding: 8px 6px !important; font: 12px Arial,sans-serif !important;}
-.training-player-fields input {padding: 6px 2px !important; font-size: 25px !important;}
-.training-player-check {margin-top: 6px !important;min-height: 42px !important;}
-.training-player-navigation {margin: 2px 0 !important; width: 100%;}
-.training-player-navigation button {min-height: 36px !important;}
-.training-player-start,.training-player-finish {padding: 8px 16px !important;min-height: 38px !important;}
-@media(max-height: 740px) {
-  .training-player {gap: 4px !important;}
-  .training-player-title {font-size: 32px !important;}
-  .training-player-exercise {font-size: 25px !important;}
-  .training-player-modern {padding: 7px !important;}
+.training-player-progress {
+  margin: 5px 0 0 !important;
+  gap: 8px;
+  justify-content: center !important;
 }
-
+.training-player-progress-track {
+  margin: 2px 0 4px !important;
+  width: 100%;
+}
+.training-player-exercise {
+  margin: 2px 0 4px !important;
+  font:
+    30px/1.05 "Bebas Neue",
+    Arial,
+    sans-serif !important;
+}
+.training-player-note {
+  margin: 0 !important;
+  font-size: 13px !important;
+}
+.training-series-pills {
+  margin: 6px 0 !important;
+  gap: 8px !important;
+}
+.training-series-pills span {
+  padding: 6px 12px !important;
+}
+.training-player-modern {
+  padding: 10px !important;
+  gap: 8px !important;
+  border-radius: 15px !important;
+}
+.training-player-fields label {
+  padding: 8px 6px !important;
+  font:
+    12px Arial,
+    sans-serif !important;
+}
+.training-player-fields input {
+  padding: 6px 2px !important;
+  font-size: 25px !important;
+}
+.training-player-check {
+  margin-top: 6px !important;
+  min-height: 42px !important;
+}
+.training-player-navigation {
+  margin: 2px 0 !important;
+  width: 100%;
+}
+.training-player-navigation button {
+  min-height: 36px !important;
+}
+.training-player-start,
+.training-player-finish {
+  padding: 8px 16px !important;
+  min-height: 38px !important;
+}
+@media (max-height: 740px) {
+  .training-player {
+    gap: 4px !important;
+  }
+  .training-player-title {
+    font-size: 32px !important;
+  }
+  .training-player-exercise {
+    font-size: 25px !important;
+  }
+  .training-player-modern {
+    padding: 7px !important;
+  }
+}
 
 /* version 12 overrides */
 .workout-management .workout-editor-form .workout-title-label,
@@ -2829,8 +3201,12 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   font-size: 25px !important;
   line-height: 1.05 !important;
 }
-.workout-preview {padding: 0 0 10px !important;}
-.workout-preview .row {padding: 12px 18px !important;}
+.workout-preview {
+  padding: 0 0 10px !important;
+}
+.workout-preview .row {
+  padding: 12px 18px !important;
+}
 .student-create-toggle {
   padding: 16px 18px !important;
   min-height: 56px !important;
@@ -2842,7 +3218,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 .training-series-pills span,
 .training-player-start,
 .training-player-finish {
-    font-family: 'Bebas Neue', sans-serif;
+  font-family: "Bebas Neue", sans-serif;
 }
 .training-player-title {
   font-size: clamp(26px, 7.5vw, 46px) !important;
@@ -2857,7 +3233,9 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   align-items: center !important;
   justify-content: center !important;
   gap: 4px !important;
-  font: 700 17px/1.2 Arial, sans-serif !important;
+  font:
+    700 17px/1.2 Arial,
+    sans-serif !important;
   margin: 0 !important;
 }
 .training-player-progress-track,
@@ -2902,7 +3280,9 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 }
 .training-player-timer-value {
   display: block !important;
-  font: 700 clamp(30px, 8vw, 48px)/1 Arial, sans-serif !important;
+  font:
+    700 clamp(30px, 8vw, 48px)/1 Arial,
+    sans-serif !important;
   color: #fff !important;
 }
 .weight-chart-highlights {
@@ -2910,21 +3290,30 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   flex-direction: column !important;
   gap: 6px !important;
 }
-.student-professor-contact {margin-top: 22px;}
-.student-professor-contact h3 {font: 22px "Bebas Neue", Arial, sans-serif; margin-bottom: 8px;}
+.student-professor-contact {
+  margin-top: 22px;
+}
+.student-professor-contact h3 {
+  font:
+    22px "Bebas Neue",
+    Arial,
+    sans-serif;
+  margin-bottom: 8px;
+}
 .professor-contact-name {
   color: var(--team-color);
   text-decoration: none;
   font-weight: 700;
 }
-.professor-contact-name:hover {text-decoration: underline;}
+.professor-contact-name:hover {
+  text-decoration: underline;
+}
 .profile-load-chart,
 .evaluation-load-bars,
 .weight-bar-chart,
 .load-bars {
   overflow-x: auto;
 }
-
 
 .training-player-title,
 .training-player-progress,
@@ -2948,7 +3337,9 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   color: #fff;
   text-align: center;
   margin: 6px 0 8px;
-  font: 14px/1.35 Arial, sans-serif;
+  font:
+    14px/1.35 Arial,
+    sans-serif;
 }
 .training-player-modern {
   background: 0;
@@ -3002,7 +3393,10 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   letter-spacing: 0 !important;
 }
 .workout-management .workout-editor-form .exercise-edit-heading {
-  font: 400 23px/1.2 "Bebas Neue", Arial, sans-serif !important;
+  font:
+    400 23px/1.2 "Bebas Neue",
+    Arial,
+    sans-serif !important;
   text-transform: none !important;
 }
 .workout-management .workout-editor-form .workout-title-input,
@@ -3010,7 +3404,9 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 .workout-management .workout-editor-form .exercise-name-input,
 .workout-management .workout-editor-form .exercise-sets-input,
 .workout-management .workout-editor-form .exercise-note-input {
-  font: 400 16px/1.3 Arial, sans-serif !important;
+  font:
+    400 16px/1.3 Arial,
+    sans-serif !important;
   text-transform: none !important;
 }
 .workout-management .workout-editor-form .exercise-media-input {
@@ -3018,10 +3414,12 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   font-size: 12px !important;
   font-weight: 400 !important;
 }
-.workout-management .workout-editor-form #exerciseEditor + .workout-add-exercise {
+.workout-management
+  .workout-editor-form
+  #exerciseEditor
+  + .workout-add-exercise {
   margin-top: 12px !important;
 }
-
 
 .phone-required-label {
   font-family: Arial, sans-serif !important;
@@ -3047,14 +3445,22 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   line-height: 1.1 !important;
 }
 .workout-management .payment-student-toggle > span:first-child,
-.payment-page:not(.workout-management) .payment-student-toggle > span:first-child,
+.payment-page:not(.workout-management)
+  .payment-student-toggle
+  > span:first-child,
 .evaluation-student-name {
   margin: 0 !important;
   padding: 0 !important;
-  font: 400 25px/1.1 "Bebas Neue", Arial, sans-serif !important;
+  font:
+    400 25px/1.1 "Bebas Neue",
+    Arial,
+    sans-serif !important;
 }
 .workout-management .workout-editor-form .workout-title-label {
-  font: 400 23px/1.2 "Bebas Neue", Arial, sans-serif !important;
+  font:
+    400 23px/1.2 "Bebas Neue",
+    Arial,
+    sans-serif !important;
   text-transform: none !important;
   margin-bottom: 2px !important;
 }
@@ -3063,14 +3469,17 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   font-family: "Bebas Neue", Arial, sans-serif !important;
   font-size: 20px !important;
   font-weight: 400 !important;
-  letter-spacing: .02em !important;
+  letter-spacing: 0.02em !important;
 }
 .developer-contact-link {
   display: block;
   margin: 22px auto 8px;
   padding: 10px 8px;
   color: var(--team-color);
-  font: 400 17px/1.3 "Bebas Neue", Arial, sans-serif;
+  font:
+    400 17px/1.3 "Bebas Neue",
+    Arial,
+    sans-serif;
   text-align: center;
   text-decoration: underline;
   text-underline-offset: 4px;
@@ -3081,18 +3490,18 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 }
 
 .workout-management .payment-student {
-    border: none !important;
-    border-bottom: 1px solid var(--team-color) !important;
-    border-radius: 0 !important;
-    background: transparent !important;
-    margin-bottom: 20px !important;
+  border: none !important;
+  border-bottom: 1px solid var(--team-color) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  margin-bottom: 20px !important;
 }
 
 .workout-management .payment-student-toggle {
-    border: none !important;
-    border-bottom: none !important;
-    border-radius: 0 !important;
-    background: transparent !important;
+  border: none !important;
+  border-bottom: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
 }
 
 /* Contorno completo somente durante edição ou inclusão; mantém estado compacto. */
@@ -3114,19 +3523,337 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 }
 
 .workout-management .payment-student[open] {
-    border: 1px solid var(--team-color) !important;
-    border-radius: 12px !important;
-    overflow: hidden;
+  border: 1px solid var(--team-color) !important;
+  border-radius: 12px !important;
+  overflow: hidden;
 }
 
 .workout-management .payment-student[open] > .payment-student-toggle {
-    border: 0 !important;
+  border: 0 !important;
 }
-.training-player-session-actions {display:flex;align-items:stretch;justify-content:center;gap:12px;width:100%;max-width:420px;margin:32px auto 0;}
-.training-player-session-actions .training-player-start,.training-player-session-actions .training-player-finish {flex:1 1 0;min-width:0;width:auto !important;margin:0 !important;white-space:nowrap;font-size:clamp(12px,3vw,16px);}
-.training-series-pills .training-series-pill {background:#242424;color:#fff;border:1px solid transparent;border-radius:50%;min-width:38px;min-height:38px;cursor:pointer;font-family:inherit;}
-.training-series-pills .training-series-pill.selected {border:2px solid var(--team-color);}
-.training-series-pills .training-series-pill.completed:not(.selected) {border-color:var(--team-color);}
+.training-player-session-actions {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 420px;
+  margin: 32px auto 0;
+}
+.training-player-session-actions .training-player-start,
+.training-player-session-actions .training-player-finish {
+  flex: 1 1 0;
+  min-width: 0;
+  width: auto !important;
+  margin: 0 !important;
+  white-space: nowrap;
+  font-size: clamp(12px, 3vw, 16px);
+}
+.training-series-pills .training-series-pill {
+  background: #242424;
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  min-width: 38px;
+  min-height: 38px;
+  cursor: pointer;
+  font-family: inherit;
+}
+.training-series-pills .training-series-pill.selected {
+  border: 2px solid var(--team-color);
+}
+.training-series-pills .training-series-pill.completed:not(.selected) {
+  border-color: var(--team-color);
+}
 
-.training-player-back, .training-player-back:hover, .training-player-back:focus { border: 0 !important; outline: none; box-shadow: none; background: transparent !important; }
-.training-player-session-actions .training-player-start, .training-player-session-actions .training-player-finish { font-size: clamp(18px, 4.5vw, 23px) !important; line-height: 1.2 !important; min-height: 48px !important; padding: 10px 8px !important; }
+.training-player-back,
+.training-player-back:hover,
+.training-player-back:focus {
+  border: 0 !important;
+  outline: none;
+  box-shadow: none;
+  background: transparent !important;
+}
+.training-player-session-actions .training-player-start,
+.training-player-session-actions .training-player-finish {
+  font-size: clamp(18px, 4.5vw, 23px) !important;
+  line-height: 1.2 !important;
+  min-height: 48px !important;
+  padding: 10px 8px !important;
+}
+.workout-links .workout-slide:not([open]) {
+  border: 0 !important;
+  border-bottom: 1px solid var(--team-color) !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+}
+.workout-links .workout-slide[open] {
+  border: 1px solid var(--team-color) !important;
+  border-radius: 12px !important;
+  background: #030303 !important;
+}
+.workout-type-options {
+  border: 0;
+  padding: 0;
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.workout-type-options input {
+  accent-color: var(--team-color);
+}
+#strengthFields:not([hidden]),
+#cardioFields:not([hidden]) {
+  display: grid;
+  gap: 12px;
+}
+#strengthFields[hidden],
+#cardioFields[hidden] {
+  display: none !important;
+}
+.cardio-description {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.student-contact-edit-dialog {
+  background: #080808;
+  color: white;
+  border: 1px solid var(--team-color);
+  border-radius: 12px;
+  width: min(90vw, 420px);
+}
+.student-contact-edit {
+  border: 1px solid var(--team-color);
+  background: black;
+  color: white;
+  padding: 8px;
+  border-radius: 8px;
+}
+.app-monthly-payment {
+  display: grid;
+  gap: 10px;
+  text-align: center;
+  padding: 20px;
+}
+
+.membership-pix-qr {
+  width: min(100%, 240px);
+  margin: auto;
+  background: white;
+}
+.load-reps-click {
+  cursor: pointer;
+}
+.load-reps-click:focus-visible {
+  outline: 2px solid var(--team-color);
+  outline-offset: 3px;
+}
+.load-reps-legend,
+.load-reps-result {
+  font:
+    12px Arial,
+    sans-serif;
+  margin: 10px 0;
+  color: #fff;
+}
+.load-reps-result {
+  color: var(--team-color);
+}
+.student-delete-action {
+  background: #000;
+  color: #fff;
+  border: 1px solid var(--team-color);
+  border-radius: 10px;
+  padding: 9px 14px;
+  font:
+    18px "Bebas Neue",
+    Arial,
+    sans-serif;
+  cursor: pointer;
+}
+
+.student-list-row {
+  position: relative;
+}
+.student-list-row .student-list-info {
+  padding-right: 80px;
+}
+.student-card-actions {
+  position: absolute;
+  top: 5px;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.student-card-actions .student-edit-action {
+  font-size: 15px !important;
+}
+
+.student-card-actions button,
+.student-dialog-cancel {
+  border: 0 !important;
+  background: transparent !important;
+  padding: 4px !important;
+  min-width: 32px;
+  min-height: 32px;
+  font:
+    15px 'Arial',
+    sans-serif !important;
+  color: #fff;
+  cursor: pointer;
+}
+.student-card-actions .student-delete-action,
+.student-dialog-cancel {
+  color: #ff0000 !important;
+}
+.student-contact-edit-dialog {
+  position: relative;
+}
+.student-dialog-cancel {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+.student-contact-edit-dialog h2 {
+  padding-right: 36px;
+}
+.published-workout-actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 0 !important;
+  background: transparent !important;
+  padding: 0 !important;
+}
+.published-workout-actions button {
+  border: 0 !important;
+  background: transparent !important;
+  width: auto !important;
+  flex: 1;
+}
+.published-workout-actions button:last-child {
+  color: #ff646f !important;
+}
+.payment-page .app-monthly-payment {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.workout-management
+  .workout-editor-form
+  .exercise-edit:last-child
+  .exercise-remove-button {
+  margin-top: 48px !important;
+}
+.workout-management
+  .workout-editor-form
+  #exerciseEditor
+  + .workout-add-exercise {
+  margin-top: 8px !important;
+}
+.workout-management .workout-editor-form .workout-save-button {
+  margin-top: 8px !important;
+  margin-bottom: 0 !important;
+}
+.workout-management .workout-type-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0 0 18px;
+  padding: 0;
+  min-width: 0;
+}
+.workout-type-options legend {
+  margin-bottom: 12px;
+  font:
+    20px "Bebas Neue",
+    Arial,
+    sans-serif;
+}
+.workout-management .workout-type-options label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #000;
+  cursor: pointer;
+  font:
+    14px Arial,
+    sans-serif;
+}
+.workout-management .workout-type-options input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+.workout-management .workout-type-options label:has(input:checked) {
+  border-color: var(--team-color);
+  color: var(--team-color);
+  background: color-mix(in srgb, var(--team-color) 9%, #000);
+}
+.workout-management .workout-type-options label:has(input:focus-visible) {
+  outline: 2px solid var(--team-color);
+  outline-offset: 3px;
+}
+
+.student-inline-edit {
+  width: 100%;
+  margin-top: 14px;
+  box-sizing: border-box;
+  background: #030303;
+}
+.student-inline-edit .app-form {
+  display: grid;
+  gap: 12px;
+}
+.student-inline-edit .app-form label {
+  display: grid;
+  gap: 6px;
+}
+.student-inline-edit .app-form > .btn {
+  justify-self: start;
+}
+.workout-management .workout-item-content .published-workout-actions {
+  justify-content: flex-start !important;
+  gap: 16px !important;
+}
+.workout-management
+  .workout-item-content
+  .published-workout-actions
+  > button.btn-action.ui-button.btn {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+  padding: 8px 0 !important;
+}
+.workout-management
+  .workout-item-content
+  .published-workout-actions
+  > button:last-child {
+  color: #ff0000 !important;
+}
+.training-player .training-player-timer-value {
+  font-size: clamp(37.5px, 10vw, 60px) !important;
+}
+.workout-links .workout-preview .row {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}

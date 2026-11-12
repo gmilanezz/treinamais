@@ -142,6 +142,8 @@ class WorkoutSet(Base):
     exercise_name = Column(String)
     set_number = Column(Integer)
     load_kg = Column(Float)
+    reps = Column(Integer, nullable=True)
+    session_key = Column(String, nullable=True)
     performed_at = Column(DateTime, default=datetime.utcnow)
 
 class WorkoutNotification(Base):
@@ -181,6 +183,14 @@ with engine.begin() as conn:
     for column, sqltype in {"email":"VARCHAR", "phone":"VARCHAR", "contact_pending":"BOOLEAN DEFAULT FALSE"}.items():
         if column not in user_columns:
             conn.execute(text(f"ALTER TABLE users ADD COLUMN {column} {sqltype}"))
+
+with engine.begin() as conn:
+    if "reps" not in {c["name"] for c in inspect(conn).get_columns("workout_sets")}:
+        conn.execute(text("ALTER TABLE workout_sets ADD COLUMN reps INTEGER"))
+
+with engine.begin() as conn:
+    if "session_key" not in {c["name"] for c in inspect(conn).get_columns("workout_sets")}:
+        conn.execute(text("ALTER TABLE workout_sets ADD COLUMN session_key VARCHAR"))
 
 app = FastAPI(title="App de Treinos API")
 app.add_middleware(
@@ -384,8 +394,8 @@ def student_dashboard(u=Depends(me), s: Session = Depends(db)):
     today = date.today()
     dates = [x.completed_at.date() for x in s.query(Completion).filter(Completion.student_id == u.id).all()]
     week_start = today - timedelta(days=today.weekday())
-    loads = s.query(WorkoutSet).filter(WorkoutSet.student_id == u.id).order_by(WorkoutSet.performed_at.desc()).limit(12).all()
-    return {"week":sum(d >= week_start for d in dates), "month":sum(d.year == today.year and d.month == today.month for d in dates), "year":sum(d.year == today.year for d in dates), "loads":[{"load_kg":x.load_kg,"exercise_name":x.exercise_name,"performed_at":x.performed_at.isoformat()} for x in reversed(loads)]}
+    loads = s.query(WorkoutSet).filter(WorkoutSet.student_id == u.id, WorkoutSet.session_key.is_(None)).order_by(WorkoutSet.performed_at.desc()).all()
+    return {"week":sum(d >= week_start for d in dates), "month":sum(d.year == today.year and d.month == today.month for d in dates), "year":sum(d.year == today.year for d in dates), "loads":[{"load_kg":x.load_kg,"reps":x.reps,"exercise_name":x.exercise_name,"performed_at":x.performed_at.isoformat()} for x in reversed(loads)]}
 
 @app.get("/api/me/notifications")
 def notifications(u=Depends(me), s: Session = Depends(db)):
@@ -420,7 +430,7 @@ def students(u=Depends(me), s: Session = Depends(db)):
 @app.post("/api/students")
 def add_student(x: StudentIn, u=Depends(me), s: Session = Depends(db)):
     allow_prof(u)
-    if not x.phone or not re.fullmatch(r"[0-9]{11}", x.phone.strip()):
+    if x.phone and not re.fullmatch(r"[0-9]{11}", x.phone.strip()):
         raise HTTPException(400, "Informe WhatsApp com DDD e 9 dígitos, sem espaços")
     if len(x.password) < 5:
         raise HTTPException(400, "A senha deve ter pelo menos 5 caracteres")
@@ -439,6 +449,28 @@ def add_student(x: StudentIn, u=Depends(me), s: Session = Depends(db)):
     s.refresh(st)
     return {"id": st.id}
 
+
+class StudentEdit(BaseModel):
+    name: str
+    username: str
+    phone: Optional[str] = None
+
+@app.put("/api/students/{sid}")
+def edit_student(sid: int, x: StudentEdit, u=Depends(me), s: Session=Depends(db)):
+    allow_prof(u)
+    st = s.get(User, sid)
+    if not st or st.role != "student" or st.professor_id != u.id:
+        raise HTTPException(404, "Aluno não encontrado")
+    name, username = x.name.strip(), x.username.strip().casefold()
+    phone = (x.phone or "").strip()
+    if not name or not username or (phone and not re.fullmatch(r"[0-9]{11}", phone)):
+        raise HTTPException(400, "Dados inválidos")
+    if s.query(User).filter(func.lower(User.username)==username, User.id!=sid).first():
+        raise HTTPException(409, "Usuário já existe")
+    st.name, st.username, st.phone = name, username, phone or None
+    st.contact_pending = not bool(st.email and st.phone)
+    s.commit()
+    return {"ok": True}
 
 class ContactUpdate(BaseModel):
     email: str
@@ -461,8 +493,14 @@ def update_my_contact(x: ContactUpdate, u=Depends(me), s: Session=Depends(db)):
 def del_student(sid: int, u=Depends(me), s: Session = Depends(db)):
     allow_prof(u)
     st = s.get(User, sid)
-    if not st or (u.role != "admin" and st.professor_id != u.id):
+    if not st or st.role != "student" or (u.role != "admin" and st.professor_id != u.id):
         raise HTTPException(404)
+    workout_ids=s.query(Workout.id).filter_by(student_id=sid)
+    for model in (Completion, WorkoutSet):
+        s.query(model).filter((model.student_id==sid) | model.workout_id.in_(workout_ids)).delete(synchronize_session=False)
+    s.query(Payment).filter(Payment.plan_id.in_(s.query(PaymentPlan.id).filter_by(student_id=sid))).delete(synchronize_session=False)
+    for model in (PaymentPlan, Lesson, Photo, Weight, WorkoutNotification, Workout):
+        s.query(model).filter_by(student_id=sid).delete(synchronize_session=False)
     s.delete(st)
     s.commit()
     return {"ok": True}
@@ -531,7 +569,7 @@ def workouts(u=Depends(me), s: Session = Depends(db)):
 def save_workout(x: WorkoutIn, u=Depends(me), s: Session = Depends(db)):
     allow_prof(u)
     st = s.get(User, x.student_id)
-    if not st or (u.role != "admin" and st.professor_id != u.id):
+    if not st or st.role != "student" or (u.role != "admin" and st.professor_id != u.id):
         raise HTTPException(403)
     w = Workout(professor_id=u.id, **x.model_dump())
     s.add(w)
@@ -585,12 +623,13 @@ def workout_detail(wid: int, u=Depends(me), s: Session = Depends(db)):
 
 
 @app.post("/api/workouts/{wid}/complete")
-def complete(wid: int, u=Depends(me), s: Session = Depends(db)):
+def complete(wid: int, session_key: str, u=Depends(me), s: Session = Depends(db)):
     if u.role != "student":
         raise HTTPException(403)
     w = s.get(Workout, wid)
     if not w or w.student_id != u.id:
         raise HTTPException(404)
+    s.query(WorkoutSet).filter_by(student_id=u.id, workout_id=wid, session_key=session_key).update({WorkoutSet.session_key: None})
     s.add(Completion(student_id=u.id, workout_id=wid))
     s.commit()
     return {"ok": True}
@@ -763,6 +802,9 @@ class SetEntry(BaseModel):
     exercise_name:str
     set_number:int
     load_kg:float
+    reps: Optional[int] = None
+    entry_id: Optional[int] = None
+    session_key: str
 
 @app.post("/api/workout-sets")
 def record_set(x:SetEntry,u=Depends(me),s:Session=Depends(db)):
@@ -773,13 +815,36 @@ def record_set(x:SetEntry,u=Depends(me),s:Session=Depends(db)):
     except (ValueError,TypeError):exercises=[]
     match=next((e for i,e in enumerate(exercises) if isinstance(e,dict) and str(e.get("key") or f"exercise-{i}")==x.exercise_key),None) if isinstance(exercises,list) else None
     if not match or x.exercise_name!=match.get("name") or x.set_number<1 or x.set_number>int(match.get("sets",0)) or not 0<=x.load_kg<=2000:raise HTTPException(400,"Série inválida")
-    s.add(WorkoutSet(workout_id=w.id,student_id=u.id,exercise_key=x.exercise_key,exercise_name=x.exercise_name,set_number=x.set_number,load_kg=x.load_kg));s.commit();return {"ok":True}
+    if x.reps is not None and not 0 <= x.reps <= 1000: raise HTTPException(400, "Repetições inválidas")
+    if x.entry_id is not None:
+        row=s.get(WorkoutSet,x.entry_id)
+        if not row or row.session_key != x.session_key or (row.student_id,row.workout_id,row.exercise_key,row.set_number)!=(u.id,w.id,x.exercise_key,x.set_number): raise HTTPException(404)
+        row.load_kg=x.load_kg; row.reps=x.reps
+    else:
+        row=WorkoutSet(workout_id=w.id,student_id=u.id,exercise_key=x.exercise_key,exercise_name=x.exercise_name,set_number=x.set_number,load_kg=x.load_kg,reps=x.reps,session_key=x.session_key)
+        s.add(row)
+    s.commit(); s.refresh(row); return {"ok":True,"id":row.id}
+
+@app.delete("/api/workout-sets/{wid}/session/{session_key}")
+def cancel_session(wid:int, session_key:str, u=Depends(me), s:Session=Depends(db)):
+    if u.role != "student": raise HTTPException(403)
+    s.query(WorkoutSet).filter_by(student_id=u.id, workout_id=wid, session_key=session_key).delete()
+    s.commit()
+    return {"ok":True}
+
+@app.get("/api/students/{sid}/frequency")
+def student_frequency(sid:int, u=Depends(me), s:Session=Depends(db)):
+    st=s.get(User,sid)
+    if u.role != "professor" or not st or st.role != "student" or st.professor_id != u.id: raise HTTPException(404)
+    today=date.today()
+    dates=[x.completed_at.date() for x in s.query(Completion).filter_by(student_id=sid).all()]
+    return {"week":sum(today-timedelta(days=today.weekday()) <= d <= today for d in dates), "month":sum(d.year==today.year and d.month==today.month and d<=today for d in dates)}
 
 @app.get("/api/workout-sets/{wid}")
 def workout_sets(wid:int,u=Depends(me),s:Session=Depends(db)):
     w=s.get(Workout,wid)
     if not w or (u.id!=w.student_id and u.id!=w.professor_id):raise HTTPException(404)
-    return [{"exercise_key":x.exercise_key,"exercise_name":x.exercise_name,"set_number":x.set_number,"load_kg":x.load_kg,"performed_at":x.performed_at.isoformat()} for x in s.query(WorkoutSet).filter_by(workout_id=wid,student_id=w.student_id).order_by(WorkoutSet.performed_at).all()]
+    return [{"exercise_key":x.exercise_key,"exercise_name":x.exercise_name,"set_number":x.set_number,"load_kg":x.load_kg,"reps":x.reps,"performed_at":x.performed_at.isoformat()} for x in s.query(WorkoutSet).filter_by(workout_id=wid,student_id=w.student_id,session_key=None).order_by(WorkoutSet.performed_at).all()]
 
 # Arquivos de exercícios: armazenamento persistente no banco (compatível com hospedagem efêmera).
 from fastapi.responses import Response
@@ -810,3 +875,23 @@ def read_exercise_media(key:str,s:Session=Depends(db)):
     row=s.get(ExerciseMedia,key)
     if not row: raise HTTPException(404)
     return Response(content=base64.b64decode(row.payload),media_type=row.mime,headers={'Cache-Control':'private, max-age=3600','X-Content-Type-Options':'nosniff'})
+
+@app.get('/api/app-membership/pix')
+def membership_pix(u=Depends(me)):
+    allow_prof(u)
+    key=os.getenv('PIX_KEY','').strip()
+    name=os.getenv('PIX_RECEIVER_NAME','').strip()
+    city=os.getenv('PIX_RECEIVER_CITY','').strip()
+    if not all((key,name,city)):
+        return {'configured':False}
+    import io, unicodedata, qrcode
+    def clean(v,n):
+        return unicodedata.normalize('NFKD',v).encode('ascii','ignore').decode().upper()[:n]
+    def tlv(tag,v):
+        if len(v.encode())>99: raise HTTPException(500,'Configuração Pix inválida')
+        return tag+f'{len(v.encode()):02d}'+v
+    payload=tlv('00','01')+tlv('26',tlv('00','br.gov.bcb.pix')+tlv('01',key))+tlv('52','0000')+tlv('53','986')+tlv('54','30.00')+tlv('58','BR')+tlv('59',clean(name,25))+tlv('60',clean(city,15))+tlv('62',tlv('05','***'))+'6304'
+    import binascii
+    payload+=f'{binascii.crc_hqx(payload.encode(),0xffff):04X}'
+    buf=io.BytesIO(); qrcode.make(payload).save(buf,format='PNG')
+    return {'configured':True,'payload':payload,'image':'data:image/png;base64,'+base64.b64encode(buf.getvalue()).decode()}

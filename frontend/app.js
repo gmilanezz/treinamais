@@ -132,7 +132,7 @@ async function register(role) {
   let professors = [];
   if (role === "student")
     professors = await fetch(API + "/public/professors").then((r) => r.json());
-  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<button class="ui-button text-btn" onclick="login()">Voltar ao login</button><div><h1 class="page-heading">${role === "professor" ? "Professor" : "Aluno"}</h1><p class="text-paragraph muted">Use o código de 5 caracteres fornecido pelo professor.</p></div><form class="app-form" id="rf"><label class="field">Nome completo<input class="form-control" id="rn" required></label><label class="field">Usuário<input class="form-control" id="ru" required></label>${role === "student" ? `<label class="field">Professor<select class="form-select" id="rp" required><option value="">Selecione</option>${professors.map((x) => `<option value="${x.id}">${x.name}</option>`).join("")}</select></label>` : ""}<label class="field phone-required-label">Telefone com DDD 11 dígitos sem espaços<input class="form-control" id="rphone" type="tel" inputmode="numeric" maxlength="12" pattern="[0-9]{11}" placeholder="11999999999" required></label><label class="field">Senha<input class="form-control" id="rpass" type="password" minlength="5" required></label><label class="field">Código de acesso<input id="rcode" maxlength="5" minlength="5" pattern="[A-Za-z0-9]{5}" class="form-control code-input" placeholder="A1B2C" required></label><button class="btn-action ui-button btn wide">Criar conta</button><p id="rerr" class="text-paragraph error"></p></form><a class="developer-contact-link" href="https://wa.me/5511933792008" target="_blank" rel="noopener noreferrer">Falar com o desenvolvedor do aplicativo</a></section></main>`;
+  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<button class="ui-button text-btn" onclick="login()">Voltar ao login</button><div><h1 class="page-heading">${role === "professor" ? "Professor" : "Aluno"}</h1><p class="text-paragraph muted">Use o código de 5 caracteres fornecido pelo professor.</p></div><form class="app-form" id="rf"><label class="field">Nome completo<input class="form-control" id="rn" required></label><label class="field">Usuário<input class="form-control" id="ru" required></label>${role === "student" ? `<label class="field">Professor<select class="form-select" id="rp" required><option value="">Selecione</option>${professors.map((x) => `<option value="${x.id}">${x.name}</option>`).join("")}</select></label>` : ""}<label class="field phone-required-label">Telefone com DDD 11 dígitos sem espaços<input class="form-control" id="rphone" type="tel" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="11999999999" required></label><label class="field">Senha<input class="form-control" id="rpass" type="password" minlength="5" required></label><label class="field">Código de acesso<input id="rcode" maxlength="5" minlength="5" pattern="[A-Za-z0-9]{5}" class="form-control code-input" placeholder="A1B2C" required></label><button class="btn-action ui-button btn wide">Criar conta</button><p id="rerr" class="text-paragraph error"></p></form><a class="developer-contact-link" href="https://wa.me/5511933792008" target="_blank" rel="noopener noreferrer">Falar com o desenvolvedor do aplicativo</a></section></main>`;
   rf.onsubmit = async (e) => {
     e.preventDefault();
     try {
@@ -459,10 +459,11 @@ function drawProfileLoadChart(loads, term) {
     rows
       .map(
         (x) =>
-          `<div class="profile-load-column" title="${escapeHTML(x.exercise_name || "Exercício")}: ${Number(x.load_kg)} kg"><span>${Number(x.load_kg)}kg</span><div style="height:${Math.max(6, (Number(x.load_kg) / max) * 135)}px"></div><small>${escapeHTML(formatTreinaDate(x.performed_at))}</small></div>`,
+          `<div class="profile-load-column load-reps-click" role="button" tabindex="0" data-reps="${x.reps ?? ''}" title="${escapeHTML(x.exercise_name || "Exercício")}: ${Number(x.load_kg)} kg"><span>${Number(x.load_kg)}kg</span><div style="height:${Math.max(6, (Number(x.load_kg) / max) * 135)}px"></div><small>${escapeHTML(formatTreinaDate(x.performed_at))}</small></div>`,
       )
       .join("") ||
     '<p class="muted">Nenhuma carga registrada para este exercício.</p>';
+  bindLoadReps(holder);
 }
 async function contatosAluno() {
   const [s, professor] = await Promise.all([
@@ -498,7 +499,25 @@ function toggleStudentCreate() {
 }
 async function alunos() {
   const ss = await req("/students");
-  view.innerHTML = `<div class="grid"><section class="card student-create-surface"><button class="student-create-toggle" type="button" aria-expanded="false" aria-controls="student-create-body" onclick="toggleStudentCreate()">+ Adicionar aluno <span class="student-create-arrow">⌄</span></button><div class="student-create-body" id="student-create-body" hidden><p class="text-paragraph muted">Após cadastrar, peça ao aluno que acesse sua conta para informar telefone e e-mail.</p><form class="app-form" id="sf"><label class="field">Nome<input class="form-control" id="sn" required></label><label class="field">Usuário<input class="form-control" id="su" required></label><label class="field phone-required-label">Telefone com DDD (11 dígitos sem espaços)<input class="form-control" id="sphone" type="tel" inputmode="numeric" maxlength="12" pattern="[0-9]{11}" placeholder="11999999999" required></label><label class="field">Senha inicial<input class="form-control" id="sp" minlength="5" required></label><button class="ui-button btn">Cadastrar diretamente</button></form></div></section><section class="card"><h2 class="section-heading">Meus alunos</h2><div class="list">${ss.map((s) => `<div class="row student-list-row"><div class="student-list-info"><b class="row-title">${escapeHTML(s.name)}</b><div class="muted">@${escapeHTML(s.username)}</div></div><div class="student-nav-actions"><button class="student-nav-button" aria-label="Treinos" title="Treinos" onclick="studentWorkout(${s.id})"><span class="student-nav-icon">🏋️</span></button><button class="student-nav-button" aria-label="Avaliação" title="Avaliação" onclick="openEvaluationPage()"><svg class="student-evaluation-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l6-6 4 4 6-8M14 7h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="student-nav-button" aria-label="Calendário" title="Calendário" onclick="studentCalendar(${s.id})"><svg class="student-calendar-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 3v4M17 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><button class="student-nav-button" aria-label="Pagamento" title="Pagamento" onclick="studentPayment(${s.id})"><span class="student-nav-icon">💳</span></button><button class="student-nav-button" aria-label="Perfil" title="Perfil" onclick="studentProfile(${s.id})"><span class="student-nav-icon">👤</span></button></div><div class="student-inline-calendar" id="student-inline-calendar-${s.id}" hidden></div></div>`).join("") || '<span class="empty">Nenhum aluno.</span>'}</div></section></div><div id="editor"></div>`;
+  view.innerHTML = `<div class="grid"><section class="card student-create-surface"><button class="student-create-toggle" type="button" aria-expanded="false" aria-controls="student-create-body" onclick="toggleStudentCreate()">+ Adicionar aluno <span class="student-create-arrow">⌄</span></button><div class="student-create-body" id="student-create-body" hidden><p class="text-paragraph muted">Após cadastrar, peça ao aluno que acesse sua conta para informar telefone e e-mail.</p><form class="app-form" id="sf"><label class="field">Nome<input class="form-control" id="sn" required></label><label class="field">Usuário<input class="form-control" id="su" required></label><label class="field phone-required-label">Telefone opcional (11 dígitos sem espaços)<input class="form-control" id="sphone" type="tel" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="11999999999"></label><label class="field">Senha inicial<input class="form-control" id="sp" minlength="5" required></label><button class="ui-button btn">Cadastrar diretamente</button></form></div></section><section class="card"><h2 class="section-heading">Meus alunos</h2><div class="list">${ss.map((s) => `<div class="row student-list-row"><div class="student-card-actions"><button type="button" class="student-edit-action" data-edit-student="${s.id}" aria-label="Editar aluno" title="Editar aluno">Editar✎</button><button type="button" class="student-delete-action" data-delete-student="${s.id}" aria-label="Excluir aluno" title="Excluir aluno">Excluir×</button></div><div class="student-list-info"><b class="row-title">${escapeHTML(s.name)}</b><div class="muted">@${escapeHTML(s.username)}</div></div><div class="student-nav-actions"><button class="student-nav-button" aria-label="Treinos" title="Treinos" onclick="studentWorkout(${s.id})"><span class="student-nav-icon">🏋️</span></button><button class="student-nav-button" aria-label="Avaliação" title="Avaliação" onclick="openEvaluationPage()"><svg class="student-evaluation-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l6-6 4 4 6-8M14 7h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="student-nav-button" aria-label="Calendário" title="Calendário" onclick="studentCalendar(${s.id})"><svg class="student-calendar-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 3v4M17 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><button class="student-nav-button" aria-label="Pagamento" title="Pagamento" onclick="studentPayment(${s.id})"><span class="student-nav-icon">💳</span></button><button class="student-nav-button" aria-label="Perfil" title="Perfil" onclick="studentProfile(${s.id})"><span class="student-nav-icon">👤</span></button></div><div class="student-inline-calendar" id="student-inline-calendar-${s.id}" hidden></div></div>`).join("") || '<span class="empty">Nenhum aluno.</span>'}</div></section></div><div id="editor"></div>`;
+  view.querySelectorAll('[data-edit-student]').forEach(button => button.onclick = () => {
+    const st = ss.find(x => x.id === Number(button.dataset.editStudent));
+    const editor = view.querySelector("#editor");
+    const dialog = document.createElement("section");
+    dialog.className = "card student-contact-edit-dialog student-inline-edit";
+    dialog.innerHTML = `<form class="app-form"><h2>Editar aluno</h2><label>Nome<input name="name" class="form-control" required value="${escapeHTML(st.name)}"></label><label>Usuário<input name="username" class="form-control" required value="${escapeHTML(st.username)}"></label><label>Telefone (opcional)<input name="phone" class="form-control" type="tel" pattern="[0-9]{11}" maxlength="11" value="${escapeHTML(st.phone || '')}"></label><button class="btn">Salvar</button><button type="button" class="student-dialog-cancel" data-close aria-label="Cancelar edição" title="Cancelar edição">×</button></form>`;
+    editor.replaceChildren(dialog);
+    dialog.querySelector('[data-close]').onclick = () => dialog.remove();
+    dialog.scrollIntoView({behavior: "smooth", block: "nearest"});
+    dialog.querySelector('form').onsubmit = async e => { e.preventDefault(); try { await req('/students/'+st.id,{method:'PUT',body:JSON.stringify(Object.fromEntries(new FormData(e.target)))}); dialog.remove(); await alunos(); } catch(err) { alert(err.message); } };
+  });
+  view.querySelectorAll("[data-delete-student]").forEach(button => button.onclick = async () => {
+    const st = ss.find(x => x.id === Number(button.dataset.deleteStudent));
+    if (!confirm(`Excluir ${st.name} definitivamente? Treinos, cargas, fotos, pesos, aulas e pagamentos serão apagados.`)) return;
+    button.disabled = true;
+    try { await req(`/students/${st.id}`, {method:"DELETE"}); await alunos(); }
+    catch(err) { button.disabled = false; alert(err.message); }
+  });
   document.querySelector("#sf").onsubmit = async (e) => {
     e.preventDefault();
     try {
@@ -609,6 +628,7 @@ function formatPublishedExercises(content) {
   } catch {
     return escapeHTML(content || "");
   }
+  if (exercises?.type === "cardio") return `<p class="cardio-description">${escapeHTML(exercises.description)}</p>`;
   return Array.isArray(exercises)
     ? exercises
         .map(
@@ -673,7 +693,7 @@ async function treino() {
               `<div class="row">${escapeHTML(x.name)} · ${x.sets} séries</div>`,
           )
           .join("")
-      : escapeHTML(w.content);
+      : ex?.type === "cardio" ? `<p class="cardio-description">${escapeHTML(ex.description)}</p>` : escapeHTML(w.content);
   });
 }
 const workoutMenuIcon = `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><path d="M7 2h10l2 3v4l-3 3-2-2v12h-4V10l-2 2-3-3V5zM2 4h3v6H2zm17 0h3v6h-3z"/></svg>`;
@@ -684,6 +704,7 @@ async function treinoDetalhe(id) {
   try {
     exercises = JSON.parse(w.content);
   } catch {}
+  const cardio = exercises?.type === "cardio" ? exercises.description : null;
   if (!Array.isArray(exercises)) exercises = [];
   const steps = exercises.flatMap((ex, index) =>
     Array.from({ length: Math.max(0, Number(ex.sets) || 0) }, (_, j) => ({
@@ -692,10 +713,10 @@ async function treinoDetalhe(id) {
       set: j + 1,
     })),
   );
-  view.innerHTML = `<section class="training-player"><button class="training-player-back training-player-action" onclick="leaveWorkoutPlayer()">← Treinos</button><h1 class="training-player-title">${escapeHTML(w.title)}</h1><div class="training-player-stage" id="trainingStage"></div><div class="training-player-session-actions"><button class="training-player-start training-player-action" id="startWorkout">✕ Cancelar</button><button class="training-player-finish training-player-action" id="finishWorkout" disabled>🏁 Finalizar</button></div><div class="training-player-timer-footer"><strong class="training-player-timer-value" id="timerText">00:00:00</strong></div></section>`;
-  workoutPlayer = { id, title: w.title, steps, index: 0, started: false, savedSets: 0, entries: {}, completed: new Set() };
+  view.innerHTML = `<section class="training-player"><button class="training-player-back training-player-action" onclick="cancelWorkoutSession()">← Treinos</button><h1 class="training-player-title">${escapeHTML(w.title)}</h1><div class="training-player-stage" id="trainingStage"></div><div class="training-player-session-actions"><button class="training-player-start training-player-action" id="startWorkout">✕ Cancelar</button><button class="training-player-finish training-player-action" id="finishWorkout" disabled>🏁 Finalizar</button></div><div class="training-player-timer-footer"><strong class="training-player-timer-value" id="timerText">00:00:00</strong></div></section>`;
+  workoutPlayer = { id, title: w.title, steps, index: 0, started: false, savedSets: 0, entries: {}, completed: new Set(), sessionKey: crypto.randomUUID(), busy: false };
   document.querySelector("#startWorkout").onclick = () => {
-    if (!steps.length) {
+    if (!steps.length && !cardio) {
       alert("Este treino não possui séries cadastradas.");
       return;
     }
@@ -705,13 +726,13 @@ async function treinoDetalhe(id) {
     startAction.classList.add("training-player-cancel");
     startAction.onclick = cancelWorkoutSession;
     startWorkoutTimer(id, w.title);
-    renderWorkoutStep();
+    if (cardio) document.querySelector("#trainingStage").innerHTML = `<h2>Cardio</h2><p class="cardio-description">${escapeHTML(cardio)}</p>`; else renderWorkoutStep();
   };
   document.querySelector("#finishWorkout").onclick = () =>
     finishWorkoutTimer(id, w.title);
   document.querySelector("#trainingStage").innerHTML =
     `<div class="workout-exercise-list">${exercises.map((x, i) => `<div class="workout-exercise-row"><strong>${escapeHTML(x.name)}</strong><span class="workout-exercise-count">${Number(x.sets) || 0} séries</span>${x.note ? `<small>${escapeHTML(x.note)}</small>` : ""}${exerciseMediaButton(x)}</div>`).join("")}</div>`;
-  if (steps.length) document.querySelector("#startWorkout").click();
+  if (steps.length || cardio) document.querySelector("#startWorkout").click();
 }
 function renderWorkoutStep() {
   const p = workoutPlayer,
@@ -733,21 +754,27 @@ function renderWorkoutStep() {
   document.querySelector("#trainingSetForm").onsubmit = async (e) => {
     e.preventDefault();
     const button = e.target.querySelector("button");
+    if (p.busy) return;
+    p.busy = true;
     button.disabled = true;
     try {
-      await req("/workout-sets", {
+      const entryIndex = p.index;
+      const saved = await req("/workout-sets", {
         method: "POST",
         body: JSON.stringify({
           workout_id: p.id,
+          session_key: p.sessionKey,
           exercise_key: String(step.ex.key || `exercise-${step.index}`),
           exercise_name: step.ex.name,
           set_number: step.set,
           load_kg: Number(e.target.elements.load.value),
           reps: Number(e.target.elements.reps.value),
+          entry_id: p.entries[entryIndex]?.id ?? null,
         }),
       });
-      p.entries[p.index] = {load: e.target.elements.load.value, reps: e.target.elements.reps.value};
-      p.completed.add(p.index);
+      p.entries[entryIndex] = {id: saved.id, load: e.target.elements.load.value, reps: e.target.elements.reps.value};
+      p.index = entryIndex;
+      p.completed.add(entryIndex);
       p.savedSets = p.completed.size;
       const next = p.steps.findIndex((_, i) => i > p.index && !p.completed.has(i));
       if (next >= 0) p.index = next;
@@ -756,7 +783,7 @@ function renderWorkoutStep() {
     } catch (err) {
       button.disabled = false;
       alert(err.message);
-    }
+    } finally { p.busy = false; }
   };
 }
 async function showLastRegisteredLoad(player, step) {
@@ -781,16 +808,19 @@ async function showLastRegisteredLoad(player, step) {
     if (info.isConnected) info.textContent = "Última carga registrada: indisponível";
   }
 }
-function cancelWorkoutSession() {
-  if (!workoutPlayer?.started) return;
-  const message = workoutPlayer.savedSets
-    ? "Cancelar o treino? As séries já registradas permanecerão salvas no histórico."
-    : "Cancelar o treino iniciado por engano?";
-  if (!confirm(message)) return;
-  leaveWorkoutPlayer();
+async function cancelWorkoutSession() {
+  const p = workoutPlayer;
+  if (!p || p.busy) return;
+  if (!p.started) return leaveWorkoutPlayer();
+  if (!confirm("Cancelar o treino? Todas as cargas e repetições desta sessão serão descartadas.")) return;
+  p.busy = true;
+  try {
+    await req(`/workout-sets/${p.id}/session/${p.sessionKey}`, {method:"DELETE"});
+    leaveWorkoutPlayer();
+  } catch(err) { alert(err.message); } finally { p.busy = false; }
 }
 function selectWorkoutSeries(index) {
-  if (!workoutPlayer?.started || index < 0 || index >= workoutPlayer.steps.length) return;
+  if (!workoutPlayer?.started || workoutPlayer.busy || index < 0 || index >= workoutPlayer.steps.length) return;
   workoutPlayer.index = index;
   renderWorkoutStep();
 }
@@ -843,12 +873,20 @@ function formatDuration(ms) {
 }
 async function finishWorkoutTimer(id, title) {
   if (!activeWorkoutTimer || activeWorkoutTimer.id !== id) return;
-  clearInterval(activeWorkoutTimer.interval);
+  const p = workoutPlayer;
+  if (!p || p.busy) return;
+  p.busy = true;
   const duration = Date.now() - activeWorkoutTimer.started;
+  try { await req(`/workouts/${id}/complete?session_key=${encodeURIComponent(p.sessionKey)}`, {method:"POST"}); }
+  catch(err) { p.busy = false; alert(err.message); return; }
+  clearInterval(activeWorkoutTimer.interval);
   activeWorkoutTimer = null;
+  p.started = false;
   const cancelButton = document.querySelector("#startWorkout");
   if (cancelButton) cancelButton.disabled = true;
-  await req("/workouts/" + id + "/complete", { method: "POST" });
+  const form = document.querySelector("#trainingSetForm");
+  if (form) form.querySelectorAll("input,button").forEach(x=>x.disabled=true);
+  p.busy = false;
   await shareWorkoutCard(title, duration);
   const finishButton = document.querySelector("#finishWorkout");
   const startButton = document.querySelector("#startWorkout");
@@ -1051,10 +1089,11 @@ async function openStudentPhotos(id) {
   detail.hidden = false;
   detail.innerHTML = "<p>Carregando...</p>";
   try {
-    const [photos, weights, workouts] = await Promise.all([
+    const [photos, weights, workouts, frequency] = await Promise.all([
       req("/photos/" + id),
       req("/weights/" + id),
       req("/workouts"),
+      req("/students/" + id + "/frequency"),
     ]);
     const assigned = workouts.filter(
       (w) => Number(w.student_id) === Number(id),
@@ -1065,7 +1104,7 @@ async function openStudentPhotos(id) {
         sets: await req("/workout-sets/" + w.id),
       })),
     );
-    evaluationData[id] = { photos, weights, loads };
+    evaluationData[id] = { photos, weights, loads, frequency };
     detail.innerHTML = `<div class="evaluation-modes"><button class="ui-button btn" onclick="evaluationMode(${id},'photos')">Fotos</button><button class="ui-button btn" onclick="evaluationMode(${id},'loads')">Cargas</button><button class="ui-button btn" onclick="evaluationMode(${id},'weights')">Pesos</button></div><div id="evaluation-content-${id}"></div>`;
     evaluationMode(id, "photos");
   } catch (e) {
@@ -1128,7 +1167,7 @@ function evaluationMode(id, mode) {
   const options = [
     ...new Set(entries.map((x) => x.exercise_name).filter(Boolean)),
   ];
-  el.innerHTML = `<label class="field">Buscar exercício<input id="exerciseSearch" class="form-control" list="exerciseOptions" placeholder="Digite o exercício"></label><datalist id="exerciseOptions">${options.map((x) => `<option value="${escapeHTML(x)}">`).join("")}</datalist><div id="loadChart"></div>`;
+  el.innerHTML = `<div class="weight-chart-highlights"><p class="weight-summary-line">Frequência na semana: <strong>${d.frequency.week}</strong></p><p class="weight-summary-line">Frequência no mês: <strong>${d.frequency.month}</strong></p></div><label class="field">Buscar exercício<input id="exerciseSearch" class="form-control" list="exerciseOptions" placeholder="Digite o exercício"></label><datalist id="exerciseOptions">${options.map((x) => `<option value="${escapeHTML(x)}">`).join("")}</datalist><div id="loadChart"></div>`;
   const input = el.querySelector("#exerciseSearch");
   input.oninput = () => drawEvaluationLoadChart(id, input.value);
   drawEvaluationLoadChart(id, options[0] || "");
@@ -1159,6 +1198,7 @@ function drawEvaluationLoadChart(id, search) {
   if (!rows.length) {
     el.innerHTML =
       '<p class="evaluation-no-loads">Nenhuma carga registrada para este exercício.</p>';
+    bindLoadReps(el);
     return;
   }
   const max = Math.max(1, ...rows.map((x) => Number(x.load_kg)));
@@ -1172,9 +1212,23 @@ function drawEvaluationLoadChart(id, search) {
             day: "2-digit",
             month: "2-digit",
           });
-      return `<div class="evaluation-load-column" title="${escapeHTML(x.workoutTitle)} · ${escapeHTML(label)}: ${value} kg"><span class="evaluation-load-value">${value}kg</span><div class="evaluation-load-bar" style="height:${Math.max(8, (value / max) * 155)}px"></div><span class="evaluation-load-date">${escapeHTML(label)}</span></div>`;
+      return `<div class="evaluation-load-column load-reps-click" role="button" tabindex="0" data-reps="${x.reps ?? ''}" title="${escapeHTML(x.workoutTitle)} · ${escapeHTML(label)}: ${value} kg"><span class="evaluation-load-value">${value}kg</span><div class="evaluation-load-bar" style="height:${Math.max(8, (value / max) * 155)}px"></div><span class="evaluation-load-date">${escapeHTML(label)}</span></div>`;
     })
     .join("")}</div></section>`;
+  bindLoadReps(el);
+}
+
+function bindLoadReps(holder) {
+  while (holder.nextElementSibling?.matches(".load-reps-legend,.load-reps-result")) holder.nextElementSibling.remove();
+  const bars = holder.querySelectorAll(".load-reps-click");
+  if (!bars.length) return;
+  const legend = document.createElement("p");
+  legend.className = "load-reps-legend";
+  legend.textContent = "Toque em uma barra para consultar o número de repetições realizadas.";
+  const result = document.createElement("p");
+  result.className = "load-reps-result"; result.setAttribute("aria-live", "polite");
+  holder.after(legend, result);
+  bars.forEach(bar => { const show = () => { result.textContent = bar.dataset.reps === "" ? "Repetições não registradas." : `${bar.dataset.reps} repetições realizadas`; }; bar.onclick = show; bar.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(); } }; });
 }
 
 async function contato() {
@@ -1207,7 +1261,7 @@ async function contato() {
     };
 }
 async function marcaProfessor() {
-  view.innerHTML = `<section class="card"><h2>Minha identidade</h2><p>A logo oficial do TREINA+ é fixa. Personalize apenas sua cor.</p>${logo()}<form id="brandForm" class="app-form"><label class="field">Cor da equipe<input type="color" name="color" value="${brand.color}"></label><label class="field">WhatsApp do professor<input name="phone" type="tel" value="${escapeHTML(brand.phone || "")}"></label><button class="btn-action ui-button btn">Salvar identidade</button></form></section>`;
+  view.innerHTML = `<section class="card"><h2>Minha identidade</h2><p>A logo oficial do TREINA+ é fixa. Personalize apenas sua cor.</p>${logo()}<form id="brandForm" class="app-form"><label class="field">Cor da equipe<input type="color" name="color" value="${brand.color}"></label><button class="btn-action ui-button btn">Salvar identidade</button></form></section>`;
   brandForm.onsubmit = async (e) => {
     e.preventDefault();
     try {
@@ -1261,7 +1315,7 @@ async function treinosProfessor() {
               .filter((w) => Number(w.student_id) === Number(st.id))
               .map(
                 (w) =>
-                  `<details class="student-workout-entry"><summary class="student-workout-summary"><span>${escapeHTML(w.title)}</span><span class="payment-chevron"></span></summary><div class="workout-item-content">${formatPublishedExercises(w.content)}<div class="row"><button class="btn-action ui-button btn" onclick="editPublishedWorkout(${w.id})">✎ Editar</button><button class="btn-action ui-button btn" onclick="deletePublishedWorkout(${w.id})">Excluir</button></div></div></details>`,
+                  `<details class="student-workout-entry"><summary class="student-workout-summary"><span>${escapeHTML(w.title)}</span><span class="payment-chevron"></span></summary><div class="workout-item-content">${formatPublishedExercises(w.content)}<div class="row published-workout-actions"><button class="btn-action ui-button btn" onclick="editPublishedWorkout(${w.id})">✎ Editar</button><button class="btn-action ui-button btn" onclick="deletePublishedWorkout(${w.id})">Excluir</button></div></div></details>`,
               )
               .join("") || "<p>Nenhum treino.</p>"
           }</div><div class="workout-editor-actions"><button type="button" class="adicionar-treino" onclick="newPublishedWorkout(${st.id})">+ Adicionar treino</button><button type="button" class="workout-editor-close workout-editor-close-action" id="workout-editor-close-${st.id}" onclick="closeWorkoutEditor(${st.id})" hidden>✕ Fechar</button></div><div class="student-workout-editor" id="workout-editor-${st.id}"></div></div></details>`,
@@ -1317,22 +1371,33 @@ async function showWorkoutEditor(studentId) {
     "workout-editor-close-" + studentId,
   );
   if (closeAction) closeAction.hidden = false;
-  panel.innerHTML = `<section class="workout-editor-surface"><form id="publishedWorkoutForm" class="workout-editor-form"><label class="workout-title-label">Título<input name="title" class="workout-title-input" value="${escapeHTML(w?.title || "")}" required></label><label class="workout-periodization-label">Periodização<input name="periodization" class="workout-periodization-input" value="${escapeHTML(w?.periodization || "")}"></label><div id="exerciseEditor"></div><button type="button" class="workout-add-exercise" onclick="addExercise()">+ Exercício</button><button class="workout-save-button">Salvar treino</button></form></section>`;
+  panel.innerHTML = `<section class="workout-editor-surface"><form id="publishedWorkoutForm" class="workout-editor-form"><fieldset class="workout-type-options"><legend>Tipo de treino</legend><label><input type="radio" name="workoutType" value="musculacao" checked><span>Musculação</span></label><label><input type="radio" name="workoutType" value="cardio"><span>Cardio</span></label></fieldset><div id="cardioFields" hidden><label>Descreva o treino<textarea name="cardioDescription" class="workout-periodization-input"></textarea></label></div><div id="strengthFields"><label class="workout-title-label">Título<input name="title" class="workout-title-input" value="${escapeHTML(w?.title || "")}" required></label><label class="workout-periodization-label">Periodização<input name="periodization" class="workout-periodization-input" value="${escapeHTML(w?.periodization || "")}"></label><div id="exerciseEditor"></div><button type="button" class="workout-add-exercise" onclick="addExercise()">+ Exercício</button></div><button class="workout-save-button">Salvar treino</button></form></section>`;
   try {
     workoutExercises = w ? JSON.parse(w.content) : [];
   } catch {
     workoutExercises = [];
   }
+  const cardioContent = workoutExercises?.type === "cardio" ? workoutExercises.description : null;
   if (!Array.isArray(workoutExercises)) workoutExercises = [];
   if (!workoutExercises.length)
     workoutExercises = [{ name: "", sets: 3, note: "" }];
   drawExerciseEditor();
+  const form = panel.querySelector("form");
+  const syncType = () => {
+    const cardio = form.workoutType.value === "cardio";
+    form.querySelector("#strengthFields").hidden = cardio;
+    form.querySelector("#cardioFields").hidden = !cardio;
+    form.querySelectorAll("#strengthFields input, #strengthFields textarea, #strengthFields button").forEach(el => el.disabled = cardio);
+    form.cardioDescription.disabled = !cardio;
+    form.cardioDescription.required = cardio;
+  };
+  if (cardioContent !== null) { form.workoutType.value = "cardio"; form.cardioDescription.value = cardioContent; }
+  form.querySelectorAll('[name="workoutType"]').forEach(el => el.onchange = syncType);
+  syncType();
   publishedWorkoutForm.onsubmit = async (e) => {
     e.preventDefault();
-    if (
-      !workoutExercises.length ||
-      workoutExercises.some((x) => !x.name?.trim() || Number(x.sets) < 1)
-    ) {
+    const cardio = form.workoutType.value === "cardio";
+    if (!cardio && (!workoutExercises.length || workoutExercises.some((x) => !x.name?.trim() || Number(x.sets) < 1))) {
       alert("Informe exercícios e séries válidos.");
       return;
     }
@@ -1341,9 +1406,9 @@ async function showWorkoutEditor(studentId) {
         method: w ? "PUT" : "POST",
         body: JSON.stringify({
           student_id: studentId,
-          title: publishedWorkoutForm.title.value,
-          periodization: publishedWorkoutForm.periodization.value,
-          content: JSON.stringify(workoutExercises),
+          title: cardio ? "Cardio" : publishedWorkoutForm.title.value,
+          periodization: cardio ? "" : publishedWorkoutForm.periodization.value,
+          content: JSON.stringify(cardio ? {type:"cardio",description:form.cardioDescription.value.trim()} : workoutExercises),
         }),
       });
       editingWorkout = null;
@@ -1359,6 +1424,7 @@ const expandedPaymentStudents = new Set();
 
 async function pagamentos() {
   const rows = await req("/payments");
+  const pix = await req("/app-membership/pix").catch(() => ({configured:false}));
   const alerts = rows.flatMap((x) =>
     x.payments
       .filter((p) => p.alert)
@@ -1402,7 +1468,9 @@ async function pagamentos() {
       )
       .join("") ||
     '<section class="card">Cadastre um aluno primeiro para configurar os pagamentos.</section>'
-  }</div>`;
+  }<section class="app-monthly-payment card"><p>Pagamento do aplicativo a cada dia 15 de todo mês.</p><strong>R$ 30,00</strong>${pix.configured ? `<img class="membership-pix-qr" src="${escapeHTML(pix.image)}" alt="QR Code Pix de 30 reais"><button type="button" class="btn" id="copyMembershipPix">Copiar código Pix</button>` : `<p>QR Code Pix aguardando configuração da chave.</p>`}</section></div>`;
+  const copyPix = document.getElementById('copyMembershipPix');
+  if (copyPix) copyPix.onclick = async () => { try { await navigator.clipboard.writeText(pix.payload); copyPix.textContent = 'Código copiado'; } catch { alert(pix.payload); } };
   document.querySelectorAll("[data-payment-student]").forEach((card) =>
     card.addEventListener("toggle", () => {
       const id = card.dataset.paymentStudent;
@@ -1496,6 +1564,8 @@ Object.assign(window, {
   studentLessonDelete,
   shiftStudentCalendar,
   leaveWorkoutPlayer,
+  cancelWorkoutSession,
+  selectWorkoutSeries,
   alunos,
   startWorkoutTimer,
   finishWorkoutTimer,
