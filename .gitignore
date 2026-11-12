@@ -24,17 +24,7 @@ build/
 .vscode/
 .idea/
 
-Thumbs.db
-Desktop.ini
-.DS_Store
-
-*.log
-*.tmp
-*.temp
-*.bak
-*.swp
-*~
-
-*.zip
-
 /comandos.txt
+/iniciar-backend.ps1
+/iniciar-frontend.ps1
+/iniciar-local.ps1
