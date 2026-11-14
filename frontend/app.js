@@ -82,7 +82,7 @@ const CONTACT = {
 };
 let activeWorkoutTimer = null;
 function login() {
-  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<div><h1 class="page-heading accent">App de Treinos</h1><p class="text-paragraph muted">Agenda, treinos e evolução do time.</p></div><form class="app-form" id="f"><label class="field">Usuário<input class="form-control" id="u" autocomplete="username" required></label><label class="field">Senha<input class="form-control" id="p" type="password" autocomplete="current-password" required></label><button class="ui-button btn wide">Entrar</button><button type="button" class="ui-button forgot-link" onclick="forgotPassword()">Esqueci minha senha</button><p id="err" class="text-paragraph error"></p></form><div class="auth-divider"><span>Primeiro acesso?</span></div><div class="auth-actions"><button class="btn-action ui-button btn ghost" onclick="register('professor')">Criar conta de professor</button><button class="btn-action ui-button btn ghost" onclick="register('student')">Criar conta de aluno</button></div><a class="developer-contact-link" href="https://wa.me/5511933792008" target="_blank" rel="noopener noreferrer">Falar com o desenvolvedor do aplicativo</a></section></main>`;
+  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<div><h1 class="page-heading accent">App de Treinos</h1><p class="text-paragraph muted">Agenda, treinos e evolução do time.</p></div><form class="app-form" id="f"><label class="field">Usuário<input class="form-control" id="u" autocomplete="username" required></label><label class="field">Senha<input class="form-control" id="p" type="password" autocomplete="current-password" required></label><button class="ui-button btn wide">Entrar</button><button type="button" class="ui-button forgot-link" onclick="forgotPassword()">Esqueci minha senha</button><p id="err" class="text-paragraph error"></p></form><div class="auth-divider"><span>Primeiro acesso?</span></div><div class="auth-actions"><button type="button" class="btn-action ui-button btn ghost" onclick="firstAccess(document.getElementById('u').value.trim().toLowerCase())">Primeiro acesso do aluno</button><button type="button" class="btn-action ui-button btn ghost" onclick="register('professor')">Criar conta de professor</button></div><a class="developer-contact-link" href="https://wa.me/5511933792008" target="_blank" rel="noopener noreferrer">Falar com o desenvolvedor do aplicativo</a></section></main>`;
   f.onsubmit = async (e) => {
     e.preventDefault();
     let body = new URLSearchParams({
@@ -91,10 +91,30 @@ function login() {
     });
     let r = await fetch(API + "/login", { method: "POST", body });
     if (!r.ok) {
+      const result = await r.json().catch(() => ({}));
+      if (r.status === 403 && result.detail === "FIRST_ACCESS_REQUIRED") { firstAccess(u.value.trim().toLowerCase()); return; }
       err.textContent = "Usuário ou senha inválidos";
       return;
     }
     saveSession(await r.json());
+  };
+}
+function firstAccess(username = "") {
+  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<button class="ui-button text-btn" onclick="login()">Voltar ao login</button><h1 class="page-heading">Primeiro acesso</h1><form class="app-form" id="firstAccessForm"><label class="field">Usuário<input class="form-control" name="username" autocomplete="username" required></label><label class="field">Código de acesso<input class="form-control" name="activation_code" maxlength="5" minlength="5" required></label><label class="field">Nova senha<input class="form-control" name="password" type="password" minlength="5" autocomplete="new-password" required></label><label class="field">Confirmar senha<input class="form-control" name="confirm" type="password" minlength="5" autocomplete="new-password" required></label><button class="ui-button btn wide">Definir senha</button><p class="error" role="alert"></p></form></section></main>`;
+  const form = document.getElementById("firstAccessForm");
+  form.elements.username.value = username;
+  form.onsubmit = async e => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form));
+    const error = form.querySelector(".error");
+    if (data.password !== data.confirm) { error.textContent = "As senhas não coincidem."; return; }
+    try {
+      const r = await fetch(API + "/first-access", {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({username:data.username.trim().toLowerCase(), activation_code:data.activation_code, password:data.password})});
+      const result = await r.json();
+      if (!r.ok) throw new Error(result.detail || "Não foi possível ativar a conta");
+      alert("Senha definida. Entre com seu usuário e sua nova senha.");
+      login();
+    } catch (err) { error.textContent = err.message; }
   };
 }
 function forgotPassword() {
@@ -129,10 +149,8 @@ function forgotPassword() {
 }
 
 async function register(role) {
-  let professors = [];
-  if (role === "student")
-    professors = await fetch(API + "/public/professors").then((r) => r.json());
-  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<button class="ui-button text-btn" onclick="login()">Voltar ao login</button><div><h1 class="page-heading">${role === "professor" ? "Professor" : "Aluno"}</h1><p class="text-paragraph muted">Use o código de 5 caracteres fornecido pelo professor.</p></div><form class="app-form" id="rf"><label class="field">Nome completo<input class="form-control" id="rn" required></label><label class="field">Usuário<input class="form-control" id="ru" required></label>${role === "student" ? `<label class="field">Professor<select class="form-select" id="rp" required><option value="">Selecione</option>${professors.map((x) => `<option value="${x.id}">${x.name}</option>`).join("")}</select></label>` : ""}<label class="field phone-required-label">Telefone com DDD 11 dígitos sem espaços<input class="form-control" id="rphone" type="tel" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="11999999999" required></label><label class="field">Senha<input class="form-control" id="rpass" type="password" minlength="5" required></label><label class="field">Código de acesso<input id="rcode" maxlength="5" minlength="5" pattern="[A-Za-z0-9]{5}" class="form-control code-input" placeholder="A1B2C" required></label><button class="btn-action ui-button btn wide">Criar conta</button><p id="rerr" class="text-paragraph error"></p></form><a class="developer-contact-link" href="https://wa.me/5511933792008" target="_blank" rel="noopener noreferrer">Falar com o desenvolvedor do aplicativo</a></section></main>`;
+  if (role !== "professor") return login();
+  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<button class="ui-button text-btn" onclick="login()">Voltar ao login</button><div><h1 class="page-heading">Professor</h1><p class="text-paragraph muted">Use o código de 5 caracteres fornecido pelo professor.</p></div><form class="app-form" id="rf"><label class="field">Nome completo<input class="form-control" id="rn" required></label><label class="field">Usuário<input class="form-control" id="ru" required></label><label class="field phone-required-label">Telefone com DDD 11 dígitos sem espaços<input class="form-control" id="rphone" type="tel" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="11999999999" required></label><label class="field">Senha<input class="form-control" id="rpass" type="password" minlength="5" required></label><label class="field">Código de acesso<input id="rcode" maxlength="5" minlength="5" pattern="[A-Za-z0-9]{5}" class="form-control code-input" placeholder="A1B2C" required></label><button class="btn-action ui-button btn wide">Criar conta</button><p id="rerr" class="text-paragraph error"></p></form><a class="developer-contact-link" href="https://wa.me/5511933792008" target="_blank" rel="noopener noreferrer">Falar com o desenvolvedor do aplicativo</a></section></main>`;
   rf.onsubmit = async (e) => {
     e.preventDefault();
     try {
@@ -146,7 +164,7 @@ async function register(role) {
           password: rpass.value,
           role,
           invite_code: rcode.value,
-          professor_id: role === "student" ? +rp.value : null,
+          professor_id: null,
         }),
       }).then(async (r) => {
         let d = await r.json();
@@ -444,6 +462,11 @@ function drawProfileLoadChart(loads, term) {
   const q = String(term || "")
     .trim()
     .toLocaleLowerCase("pt-BR");
+  holder.classList.toggle("profile-load-empty", !q);
+  if (!q) {
+    holder.innerHTML = '<p class="muted">Digite o nome de um exercício para acompanhar a sua progressão.</p>';
+    return;
+  }
   const rows = loads
     .filter(
       (x) =>
@@ -454,12 +477,12 @@ function drawProfileLoadChart(loads, term) {
     )
     .sort((a, b) => new Date(a.performed_at) - new Date(b.performed_at))
     .slice(-15);
-  const max = Math.max(1, ...rows.map((x) => Number(x.load_kg) || 0));
+  const max = x => loadScale(rows, x);
   holder.innerHTML =
     rows
       .map(
         (x) =>
-          `<div class="profile-load-column load-reps-click" role="button" tabindex="0" data-reps="${x.reps ?? ''}" title="${escapeHTML(x.exercise_name || "Exercício")}: ${Number(x.load_kg)} kg"><span>${Number(x.load_kg)}kg</span><div style="height:${Math.max(6, (Number(x.load_kg) / max) * 135)}px"></div><small>${escapeHTML(formatTreinaDate(x.performed_at))}</small></div>`,
+          `<div class="profile-load-column load-reps-click" role="button" tabindex="0" data-reps="${x.reps ?? ''}" title="${escapeHTML(x.exercise_name || "Exercício")}: ${Number(x.load_kg)} ${loadUnit(x)}"><span>${Number(x.load_kg)} ${loadUnit(x)}</span><div style="height:${Math.max(6, (Number(x.load_kg) / max(x)) * 135)}px"></div><small>${escapeHTML(formatTreinaDate(x.performed_at))}</small></div>`,
       )
       .join("") ||
     '<p class="muted">Nenhuma carga registrada para este exercício.</p>';
@@ -499,7 +522,7 @@ function toggleStudentCreate() {
 }
 async function alunos() {
   const ss = await req("/students");
-  view.innerHTML = `<div class="grid"><section class="card student-create-surface"><button class="student-create-toggle" type="button" aria-expanded="false" aria-controls="student-create-body" onclick="toggleStudentCreate()">+ Adicionar aluno <span class="student-create-arrow">⌄</span></button><div class="student-create-body" id="student-create-body" hidden><p class="text-paragraph muted">Após cadastrar, peça ao aluno que acesse sua conta para informar telefone e e-mail.</p><form class="app-form" id="sf"><label class="field">Nome<input class="form-control" id="sn" required></label><label class="field">Usuário<input class="form-control" id="su" required></label><label class="field phone-required-label">Telefone opcional (11 dígitos sem espaços)<input class="form-control" id="sphone" type="tel" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="11999999999"></label><label class="field">Senha inicial<input class="form-control" id="sp" minlength="5" required></label><button class="ui-button btn">Cadastrar diretamente</button></form></div></section><section class="card"><h2 class="section-heading">Meus alunos</h2><div class="list">${ss.map((s) => `<div class="row student-list-row"><div class="student-card-actions"><button type="button" class="student-edit-action" data-edit-student="${s.id}" aria-label="Editar aluno" title="Editar aluno">Editar✎</button><button type="button" class="student-delete-action" data-delete-student="${s.id}" aria-label="Excluir aluno" title="Excluir aluno">Excluir×</button></div><div class="student-list-info"><b class="row-title">${escapeHTML(s.name)}</b><div class="muted">@${escapeHTML(s.username)}</div></div><div class="student-nav-actions"><button class="student-nav-button" aria-label="Treinos" title="Treinos" onclick="studentWorkout(${s.id})"><span class="student-nav-icon">🏋️</span></button><button class="student-nav-button" aria-label="Avaliação" title="Avaliação" onclick="openEvaluationPage()"><svg class="student-evaluation-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l6-6 4 4 6-8M14 7h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="student-nav-button" aria-label="Calendário" title="Calendário" onclick="studentCalendar(${s.id})"><svg class="student-calendar-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 3v4M17 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><button class="student-nav-button" aria-label="Pagamento" title="Pagamento" onclick="studentPayment(${s.id})"><span class="student-nav-icon">💳</span></button><button class="student-nav-button" aria-label="Perfil" title="Perfil" onclick="studentProfile(${s.id})"><span class="student-nav-icon">👤</span></button></div><div class="student-inline-calendar" id="student-inline-calendar-${s.id}" hidden></div></div>`).join("") || '<span class="empty">Nenhum aluno.</span>'}</div></section></div><div id="editor"></div>`;
+  view.innerHTML = `<div class="grid"><section class="card student-create-surface"><button class="student-create-toggle" type="button" aria-expanded="false" aria-controls="student-create-body" onclick="toggleStudentCreate()">+ Adicionar aluno <span class="student-create-arrow">⌄</span></button><div class="student-create-body" id="student-create-body" hidden><p class="text-paragraph muted">O aluno define a senha no primeiro acesso usando o código de acesso.</p><form class="app-form" id="sf"><label class="field">Nome<input class="form-control" id="sn" required></label><label class="field">Usuário<input class="form-control" id="su" required></label><button class="ui-button btn">Cadastrar diretamente</button></form></div></section><section class="card"><h2 class="section-heading">Meus alunos</h2><div class="list">${ss.map((s) => `<div class="row student-list-row"><div class="student-card-actions"><button type="button" class="student-edit-action" data-edit-student="${s.id}" aria-label="Editar aluno" title="Editar aluno">Editar✎</button><button type="button" class="student-delete-action" data-delete-student="${s.id}" aria-label="Excluir aluno" title="Excluir aluno">Excluir×</button></div><div class="student-list-info"><b class="row-title">${escapeHTML(s.name)}</b><div class="muted">@${escapeHTML(s.username)}</div></div><div class="student-nav-actions"><button class="student-nav-button" aria-label="Treinos" title="Treinos" onclick="studentWorkout(${s.id})"><span class="student-nav-icon">🏋️</span></button><button class="student-nav-button" aria-label="Avaliação" title="Avaliação" onclick="openEvaluationPage()"><svg class="student-evaluation-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l6-6 4 4 6-8M14 7h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="student-nav-button" aria-label="Calendário" title="Calendário" onclick="studentCalendar(${s.id})"><svg class="student-calendar-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 3v4M17 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><button class="student-nav-button" aria-label="Pagamento" title="Pagamento" onclick="studentPayment(${s.id})"><span class="student-nav-icon">💳</span></button><button class="student-nav-button" aria-label="Perfil" title="Perfil" onclick="studentProfile(${s.id})"><span class="student-nav-icon">👤</span></button></div><div class="student-inline-calendar" id="student-inline-calendar-${s.id}" hidden></div></div>`).join("") || '<span class="empty">Nenhum aluno.</span>'}</div></section></div><div id="editor"></div>`;
   view.querySelectorAll('[data-edit-student]').forEach(button => button.onclick = () => {
     const st = ss.find(x => x.id === Number(button.dataset.editStudent));
     const editor = view.querySelector("#editor");
@@ -526,10 +549,9 @@ async function alunos() {
         body: JSON.stringify({
           name: sn.value,
           username: su.value.trim().toLowerCase(),
-          phone: sphone.value,
-          password: sp.value,
         }),
       });
+      alert("Aluno cadastrado. A senha será definida pelo aluno no primeiro acesso.");
       await alunos();
     } catch (err) {
       alert(err.message);
@@ -747,7 +769,29 @@ function renderWorkoutStep() {
   }
   const group = p.steps.filter((x) => x.index === step.index);
   const groupIndex = group.findIndex((x) => x.set === step.set);
-  stage.innerHTML = `<div class="training-player-progress training-player-progress-text"><span>EXERCÍCIO ${step.index + 1}</span><span>SÉRIE ${step.set} DE ${Number(step.ex.sets) || 0}</span></div><h2 class="training-player-exercise">${escapeHTML(step.ex.name)}</h2>${exerciseMediaButton(step.ex)}${step.ex.note ? `<p class="training-player-note">${escapeHTML(step.ex.note)}</p>` : ""}<div class="training-series-pills">${group.map((x, i) => `<button type="button" class="training-series-pill ${i === groupIndex ? "selected" : ""} ${p.completed.has(p.steps.findIndex(y => y === x)) ? "completed" : ""}" onclick="selectWorkoutSeries(${p.steps.indexOf(x)})" aria-label="Ir para série ${i + 1}" aria-pressed="${i === groupIndex}">${i + 1}ª</button>`).join("")}</div><p class="training-last-load" id="trainingLastLoad">Última carga registrada: consultando...</p><form class="training-player-form training-player-modern" id="trainingSetForm"><div class="training-player-fields"><label>Peso (kg)<input class="training-player-load" name="load" type="number" min="0" max="2000" step="0.5" inputmode="decimal" required></label><label>Repetições feitas<input class="training-player-load" name="reps" type="number" min="0" max="1000" step="1" inputmode="numeric" required></label></div><button class="training-player-check training-player-action">${p.completed.has(p.index) ? "✓ Atualizar série" : "✓ Concluir série"}</button></form>`;
+  stage.innerHTML = `<div class="training-player-progress training-player-progress-text"><span>EXERCÍCIO ${step.index + 1}</span><span>SÉRIE ${step.set} DE ${Number(step.ex.sets) || 0}</span></div><h2 class="training-player-exercise">${escapeHTML(step.ex.name)}</h2>${exerciseMediaButton(step.ex)}${step.ex.note ? `<p class="training-player-note">${escapeHTML(step.ex.note)}</p>` : ""}<div class="training-series-pills">${group.map((x, i) => `<button type="button" class="training-series-pill ${i === groupIndex ? "selected" : ""} ${p.completed.has(p.steps.findIndex(y => y === x)) ? "completed" : ""}" onclick="selectWorkoutSeries(${p.steps.indexOf(x)})" aria-label="Ir para série ${i + 1}" aria-pressed="${i === groupIndex}">${i + 1}ª</button>`).join("")}</div><p class="training-last-load" id="trainingLastLoad">Última carga registrada: consultando...</p><form class="training-player-form training-player-modern" id="trainingSetForm"><div class="training-player-fields"><label>Carga<input class="training-player-load" name="load" type="number" min="0" max="2000" step="0.5" inputmode="decimal" required></label><label>Repetições feitas<input class="training-player-load" name="reps" type="number" min="0" max="1000" step="1" inputmode="numeric" required></label></div><fieldset class="training-unit-picker"><legend>Unidade de carga</legend><div class="training-unit-track">${["kg", "lbs", "p"].map(unit => `<label><input type="radio" name="load_unit" value="${unit}" ${unit === (p.entries[p.index]?.unit || p.lastUnit || "kg") ? "checked" : ""}><span>${unit}</span></label>`).join("")}</div></fieldset><button class="training-player-check training-player-action">${p.completed.has(p.index) ? "✓ Atualizar série" : "✓ Concluir série"}</button></form>`;
+  if (p.completed.size === p.steps.length && !p.editingCompleted) {
+    const button = stage.querySelector(".training-player-check");
+    const notice = document.createElement("p");
+    notice.className = "training-finish-notice";
+    notice.setAttribute("role", "status");
+    notice.textContent = "Clique em finalizar!";
+    button.replaceWith(notice);
+    stage.querySelectorAll("#trainingSetForm input").forEach(x => x.disabled = true);
+    return;
+  }
+  const unitTrack = stage.querySelector(".training-unit-track");
+  let touchX = null;
+  unitTrack.addEventListener("touchstart", e => { touchX = e.changedTouches[0].clientX; }, {passive:true});
+  unitTrack.addEventListener("touchend", e => {
+    if (touchX === null) return;
+    const delta = e.changedTouches[0].clientX - touchX;
+    touchX = null;
+    if (Math.abs(delta) < 25) return;
+    const choices = [...unitTrack.querySelectorAll("input")];
+    const index = choices.findIndex(x => x.checked);
+    choices[Math.max(0, Math.min(choices.length - 1, index + (delta < 0 ? 1 : -1)))].checked = true;
+  }, {passive:true});
   const existing = p.entries[p.index];
   if (existing) { stage.querySelector('[name="load"]').value = existing.load; stage.querySelector('[name="reps"]').value = existing.reps; }
   showLastRegisteredLoad(p, step);
@@ -768,14 +812,17 @@ function renderWorkoutStep() {
           exercise_name: step.ex.name,
           set_number: step.set,
           load_kg: Number(e.target.elements.load.value),
+          load_unit: e.target.elements.load_unit.value,
           reps: Number(e.target.elements.reps.value),
           entry_id: p.entries[entryIndex]?.id ?? null,
         }),
       });
-      p.entries[entryIndex] = {id: saved.id, load: e.target.elements.load.value, reps: e.target.elements.reps.value};
+      p.lastUnit = e.target.elements.load_unit.value;
+      p.entries[entryIndex] = {id: saved.id, unit: p.lastUnit, load: e.target.elements.load.value, reps: e.target.elements.reps.value};
       p.index = entryIndex;
       p.completed.add(entryIndex);
       p.savedSets = p.completed.size;
+      p.editingCompleted = false;
       const next = p.steps.findIndex((_, i) => i > p.index && !p.completed.has(i));
       if (next >= 0) p.index = next;
       else { const pending = p.steps.findIndex((_, i) => !p.completed.has(i)); if (pending >= 0) p.index = pending; }
@@ -802,7 +849,7 @@ async function showLastRegisteredLoad(player, step) {
       new Date(b.performed_at) - new Date(a.performed_at),
     )[0];
     info.textContent = latest
-      ? `Última carga registrada: ${Number(latest.load_kg)} kg · ${formatTreinaDate(latest.performed_at)}`
+      ? `Última carga registrada: ${Number(latest.load_kg)} ${loadUnit(latest)} · ${formatTreinaDate(latest.performed_at)}`
       : "Última carga registrada: nenhuma";
   } catch {
     if (info.isConnected) info.textContent = "Última carga registrada: indisponível";
@@ -822,6 +869,7 @@ async function cancelWorkoutSession() {
 function selectWorkoutSeries(index) {
   if (!workoutPlayer?.started || workoutPlayer.busy || index < 0 || index >= workoutPlayer.steps.length) return;
   workoutPlayer.index = index;
+  workoutPlayer.editingCompleted = true;
   renderWorkoutStep();
 }
 function moveWorkoutStep(delta) {
@@ -846,8 +894,8 @@ function drawLoadChart(i, rows) {
   const el = document.getElementById("chart-" + i);
   if (!el) return;
   const recent = rows.slice(-15),
-    max = Math.max(1, ...recent.map((x) => x.load_kg));
-  el.innerHTML = `<p class="muted">Evolução de cargas por série</p><div class="load-bars">${recent.map((x) => `<div class="load-bar" style="height:${Math.max(8, (x.load_kg / max) * 125)}px" title="${escapeHTML(x.performed_at)}"><span class="load-bar-label">${x.load_kg}kg</span></div>`).join("")}</div>${recent.length ? "" : '<p class="muted">Registre séries para visualizar o gráfico.</p>'}`;
+    max = x => loadScale(recent, x);
+  el.innerHTML = `<p class="muted">Evolução de cargas por série (escala por unidade)</p><div class="load-bars">${recent.map((x) => `<div class="load-bar" style="height:${Math.max(8, (x.load_kg / max(x)) * 125)}px" title="${escapeHTML(x.performed_at)}"><span class="load-bar-label">${x.load_kg} ${loadUnit(x)}</span></div>`).join("")}</div>${recent.length ? "" : '<p class="muted">Registre séries para visualizar o gráfico.</p>'}`;
 }
 function startWorkoutTimer(id, title) {
   if (activeWorkoutTimer) clearInterval(activeWorkoutTimer.interval);
@@ -877,25 +925,16 @@ async function finishWorkoutTimer(id, title) {
   if (!p || p.busy) return;
   p.busy = true;
   const duration = Date.now() - activeWorkoutTimer.started;
-  try { await req(`/workouts/${id}/complete?session_key=${encodeURIComponent(p.sessionKey)}`, {method:"POST"}); }
+  let result;
+  try { result = await req(`/workouts/${id}/complete?session_key=${encodeURIComponent(p.sessionKey)}`, {method:"POST"}); }
   catch(err) { p.busy = false; alert(err.message); return; }
   clearInterval(activeWorkoutTimer.interval);
   activeWorkoutTimer = null;
-  p.started = false;
-  const cancelButton = document.querySelector("#startWorkout");
-  if (cancelButton) cancelButton.disabled = true;
-  const form = document.querySelector("#trainingSetForm");
-  if (form) form.querySelectorAll("input,button").forEach(x=>x.disabled=true);
-  p.busy = false;
-  await shareWorkoutCard(title, duration);
-  const finishButton = document.querySelector("#finishWorkout");
-  const startButton = document.querySelector("#startWorkout");
-  if (finishButton) finishButton.disabled = true;
-  if (startButton) {
-    startButton.disabled = true;
-    startButton.textContent = "Treino concluído";
-    startButton.onclick = null;
-  }
+  workoutPlayer = null;
+  const progress = result.progress || [];
+  view.innerHTML = `<section class="workout-success"><h1>Parabéns pelo treino!</h1><p>${escapeHTML(title)} concluído com sucesso.</p><strong class="workout-success-week">${result.week}</strong><p>Treinos realizados nesta semana</p><h2>Sua progressão</h2>${progress.length ? progress.map(row => `<div class="workout-success-progress"><strong>${escapeHTML(row.exercise)} · ${row.series}ª série</strong>${row.load > row.old_load ? `<p>Carga: ${row.old_load} → ${row.load} ${escapeHTML(row.unit)}</p>` : ""}${row.reps != null && row.old_reps != null && row.reps > row.old_reps ? `<p>Repetições: ${row.old_reps} → ${row.reps}</p>` : ""}</div>`).join("") : `<p>${result.compared ? "Nenhuma progressão registrada em relação ao último treino. Continue firme!" : "Ainda não há séries comparáveis do último treino. Continue registrando sua evolução!"}</p>`}<button type="button" class="workout-success-link" id="shareCompletedWorkout">Compartilhar treino</button><button type="button" class="workout-success-link" id="returnProfile">Voltar à página inicial</button></section>`;
+  document.querySelector("#shareCompletedWorkout").onclick = () => shareWorkoutCard(title, duration);
+  document.querySelector("#returnProfile").onclick = () => setTab("perfil");
 }
 async function shareWorkoutCard(title, duration) {
   const canvas = document.createElement("canvas");
@@ -1201,7 +1240,7 @@ function drawEvaluationLoadChart(id, search) {
     bindLoadReps(el);
     return;
   }
-  const max = Math.max(1, ...rows.map((x) => Number(x.load_kg)));
+  const max = x => loadScale(rows, x);
   el.innerHTML = `<section class="evaluation-load-chart-section"><h3 class="evaluation-load-chart-title">${escapeHTML(search)}</h3><div class="evaluation-load-bars" role="group" aria-label="Cargas registradas para ${escapeHTML(search)}">${rows
     .map((x) => {
       const value = Number(x.load_kg);
@@ -1212,11 +1251,15 @@ function drawEvaluationLoadChart(id, search) {
             day: "2-digit",
             month: "2-digit",
           });
-      return `<div class="evaluation-load-column load-reps-click" role="button" tabindex="0" data-reps="${x.reps ?? ''}" title="${escapeHTML(x.workoutTitle)} · ${escapeHTML(label)}: ${value} kg"><span class="evaluation-load-value">${value}kg</span><div class="evaluation-load-bar" style="height:${Math.max(8, (value / max) * 155)}px"></div><span class="evaluation-load-date">${escapeHTML(label)}</span></div>`;
+      return `<div class="evaluation-load-column load-reps-click" role="button" tabindex="0" data-reps="${x.reps ?? ''}" title="${escapeHTML(x.workoutTitle)} · ${escapeHTML(label)}: ${value} ${loadUnit(x)}"><span class="evaluation-load-value">${value} ${loadUnit(x)}</span><div class="evaluation-load-bar" style="height:${Math.max(8, (value / max(x)) * 155)}px"></div><span class="evaluation-load-date">${escapeHTML(label)}</span></div>`;
     })
     .join("")}</div></section>`;
   bindLoadReps(el);
 }
+
+function loadScale(rows, row) { return Math.max(1, ...rows.filter(x => loadUnit(x) === loadUnit(row)).map(x => Number(x.load_kg) || 0)); }
+
+function loadUnit(row) { return ["kg", "lbs", "p"].includes(row.load_unit) ? row.load_unit : "kg"; }
 
 function bindLoadReps(holder) {
   while (holder.nextElementSibling?.matches(".load-reps-legend,.load-reps-result")) holder.nextElementSibling.remove();
@@ -1224,7 +1267,7 @@ function bindLoadReps(holder) {
   if (!bars.length) return;
   const legend = document.createElement("p");
   legend.className = "load-reps-legend";
-  legend.textContent = "Toque em uma barra para consultar o número de repetições realizadas.";
+  legend.textContent = "Toque em uma barra para consultar o número de repetições realizadas. As alturas são calculadas separadamente por unidade; não compare barras de unidades diferentes.";
   const result = document.createElement("p");
   result.className = "load-reps-result"; result.setAttribute("aria-live", "polite");
   holder.after(legend, result);
@@ -1268,9 +1311,8 @@ async function marcaProfessor() {
       await req("/branding", {
         method: "PUT",
         body: JSON.stringify({
-          color: brandForm.color.value,
+          color: e.currentTarget.elements.color.value,
           logo: null,
-          phone: brandForm.phone.value,
         }),
       });
       await loadBrand();
@@ -1545,6 +1587,7 @@ Object.assign(window, {
   marcaProfessor,
   evaluationMode,
   forgotPassword,
+  firstAccess,
   register,
   setTab,
   toggleMenu,

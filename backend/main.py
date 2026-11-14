@@ -142,6 +142,7 @@ class WorkoutSet(Base):
     exercise_name = Column(String)
     set_number = Column(Integer)
     load_kg = Column(Float)
+    load_unit = Column(String, default="kg", nullable=False)
     reps = Column(Integer, nullable=True)
     session_key = Column(String, nullable=True)
     performed_at = Column(DateTime, default=datetime.utcnow)
@@ -192,6 +193,10 @@ with engine.begin() as conn:
     if "session_key" not in {c["name"] for c in inspect(conn).get_columns("workout_sets")}:
         conn.execute(text("ALTER TABLE workout_sets ADD COLUMN session_key VARCHAR"))
 
+with engine.begin() as conn:
+    if "load_unit" not in {c["name"] for c in inspect(conn).get_columns("workout_sets")}:
+        conn.execute(text("ALTER TABLE workout_sets ADD COLUMN load_unit VARCHAR NOT NULL DEFAULT 'kg'"))
+
 app = FastAPI(title="App de Treinos API")
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
@@ -236,9 +241,12 @@ def allow_prof(u):
 class StudentIn(BaseModel):
     name: str
     username: str
+
+
+class FirstAccessIn(BaseModel):
+    username: str
+    activation_code: str
     password: str
-    email: Optional[str] = None
-    phone: Optional[str] = None
 
 
 class RegisterIn(BaseModel):
@@ -323,8 +331,8 @@ def register(x: RegisterIn, s: Session = Depends(db)):
     code = x.invite_code.strip().upper()
     if len(code) != 5 or not code.isalnum() or code != INVITE_CODE.upper():
         raise HTTPException(403, "Código de acesso inválido")
-    if x.role not in ("professor", "student"):
-        raise HTTPException(400, "Tipo de conta inválido")
+    if x.role != "professor":
+        raise HTTPException(403, "Somente professores podem criar conta")
     if not x.phone or not re.fullmatch(r"[0-9]{11}", x.phone.strip()):
         raise HTTPException(400, "Informe WhatsApp com DDD e 9 dígitos, sem espaços")
     username = x.username.strip().casefold()
@@ -333,11 +341,6 @@ def register(x: RegisterIn, s: Session = Depends(db)):
     if s.query(User).filter(func.lower(User.username) == username).first():
         raise HTTPException(409, "Usuário já existe")
     professor_id = None
-    if x.role == "student":
-        prof = s.get(User, x.professor_id) if x.professor_id else None
-        if not prof or prof.role != "professor":
-            raise HTTPException(400, "Selecione um professor válido")
-        professor_id = prof.id
     u = User(
         name=x.name.strip(),
         username=username,
@@ -367,15 +370,35 @@ def reset_password(x: ResetPasswordIn, s: Session = Depends(db)):
     u = s.query(User).filter(func.lower(User.username) == username, User.active == True).first()
     if not u:
         raise HTTPException(404, "Usuário não encontrado")
+    if (u.password_hash or "").startswith("pending:"):
+        raise HTTPException(403, "Use a opção Primeiro acesso")
     u.password_hash = pwd.hash(x.new_password)
     s.commit()
     return {"ok": True, "message": "Senha redefinida com sucesso"}
 
 
+@app.post("/api/first-access")
+def first_access(x: FirstAccessIn, s: Session = Depends(db)):
+    if len(x.password) < 5 or len(x.password.encode()) > 72:
+        raise HTTPException(400, "Senha deve ter entre 5 caracteres e 72 bytes")
+    u = s.query(User).filter(func.lower(User.username) == x.username.strip().casefold(), User.role == "student", User.active == True).with_for_update().first()
+    if not u:
+        raise HTTPException(404, "Nome de usuário não existe. Consulte seu professor para verificar o nome de usuário.")
+    if not (u.password_hash or "").startswith("pending:"):
+        raise HTTPException(403, "Primeiro acesso já realizado. Entre com sua senha.")
+    if x.activation_code.strip().upper() != "DG5A1":
+        raise HTTPException(403, "Código de acesso incorreto")
+    u.password_hash = pwd.hash(x.password)
+    s.commit()
+    return {"ok": True}
+
+
 @app.post("/api/login")
 def login(f: OAuth2PasswordRequestForm = Depends(), s: Session = Depends(db)):
     u = s.query(User).filter(func.lower(User.username) == f.username.strip().casefold()).first()
-    if not u or not pwd.verify(f.password, u.password_hash):
+    if u and u.active and u.role == "student" and (u.password_hash or "").startswith("pending:"):
+        raise HTTPException(403, "FIRST_ACCESS_REQUIRED")
+    if not u or not u.active or not u.password_hash or u.password_hash.startswith("pending:") or not pwd.verify(f.password, u.password_hash):
         raise HTTPException(401, "Usuário ou senha inválidos")
     return {
         "access_token": token(u),
@@ -395,7 +418,7 @@ def student_dashboard(u=Depends(me), s: Session = Depends(db)):
     dates = [x.completed_at.date() for x in s.query(Completion).filter(Completion.student_id == u.id).all()]
     week_start = today - timedelta(days=today.weekday())
     loads = s.query(WorkoutSet).filter(WorkoutSet.student_id == u.id, WorkoutSet.session_key.is_(None)).order_by(WorkoutSet.performed_at.desc()).all()
-    return {"week":sum(d >= week_start for d in dates), "month":sum(d.year == today.year and d.month == today.month for d in dates), "year":sum(d.year == today.year for d in dates), "loads":[{"load_kg":x.load_kg,"reps":x.reps,"exercise_name":x.exercise_name,"performed_at":x.performed_at.isoformat()} for x in reversed(loads)]}
+    return {"week":sum(d >= week_start for d in dates), "month":sum(d.year == today.year and d.month == today.month for d in dates), "year":sum(d.year == today.year for d in dates), "loads":[{"load_kg":x.load_kg,"load_unit":x.load_unit,"reps":x.reps,"exercise_name":x.exercise_name,"performed_at":x.performed_at.isoformat()} for x in reversed(loads)]}
 
 @app.get("/api/me/notifications")
 def notifications(u=Depends(me), s: Session = Depends(db)):
@@ -430,19 +453,17 @@ def students(u=Depends(me), s: Session = Depends(db)):
 @app.post("/api/students")
 def add_student(x: StudentIn, u=Depends(me), s: Session = Depends(db)):
     allow_prof(u)
-    if x.phone and not re.fullmatch(r"[0-9]{11}", x.phone.strip()):
-        raise HTTPException(400, "Informe WhatsApp com DDD e 9 dígitos, sem espaços")
-    if len(x.password) < 5:
-        raise HTTPException(400, "A senha deve ter pelo menos 5 caracteres")
+    if not x.name.strip() or not x.username.strip():
+        raise HTTPException(400, "Informe nome e usuário")
     if s.query(User).filter(func.lower(User.username) == x.username.strip().casefold()).first():
         raise HTTPException(409, "Usuário já existe")
     st = User(
-        name=x.name,
+        name=x.name.strip(),
         username=x.username.strip().casefold(),
-        password_hash=pwd.hash(x.password),
+        password_hash="pending:",
         role="student",
         professor_id=u.id,
-        email=x.email, phone=x.phone, contact_pending=not bool(x.email and x.phone),
+        contact_pending=True,
     )
     s.add(st)
     s.commit()
@@ -629,10 +650,31 @@ def complete(wid: int, session_key: str, u=Depends(me), s: Session = Depends(db)
     w = s.get(Workout, wid)
     if not w or w.student_id != u.id:
         raise HTTPException(404)
+    current = s.query(WorkoutSet).filter_by(student_id=u.id, workout_id=wid, session_key=session_key).all()
+    previous = s.query(Completion).filter_by(student_id=u.id, workout_id=wid).order_by(Completion.completed_at.desc(), Completion.id.desc()).limit(2).all()
+    baseline = {}
+    if previous:
+        query = s.query(WorkoutSet).filter_by(student_id=u.id, workout_id=wid, session_key=None).filter(WorkoutSet.performed_at <= previous[0].completed_at)
+        if len(previous) > 1:
+            query = query.filter(WorkoutSet.performed_at > previous[1].completed_at)
+        for row in query.order_by(WorkoutSet.performed_at, WorkoutSet.id).all():
+            baseline[(row.exercise_key, row.set_number)] = row
+    progress = []
+    compared = 0
+    for row in current:
+        prior = baseline.get((row.exercise_key, row.set_number))
+        if not prior or prior.load_unit != row.load_unit:
+            continue
+        compared += 1
+        if row.load_kg > prior.load_kg or (row.reps is not None and prior.reps is not None and row.reps > prior.reps):
+            progress.append({"exercise": row.exercise_name, "series": row.set_number, "unit": row.load_unit, "old_load": prior.load_kg, "load": row.load_kg, "old_reps": prior.reps, "reps": row.reps})
     s.query(WorkoutSet).filter_by(student_id=u.id, workout_id=wid, session_key=session_key).update({WorkoutSet.session_key: None})
     s.add(Completion(student_id=u.id, workout_id=wid))
     s.commit()
-    return {"ok": True}
+    today = date.today()
+    start = today - timedelta(days=today.weekday())
+    week = sum(start <= x.completed_at.date() <= today for x in s.query(Completion).filter_by(student_id=u.id).all())
+    return {"ok": True, "week": week, "progress": progress, "compared": compared}
 
 
 @app.get("/api/weights/{sid}")
@@ -802,6 +844,7 @@ class SetEntry(BaseModel):
     exercise_name:str
     set_number:int
     load_kg:float
+    load_unit: str = "kg"
     reps: Optional[int] = None
     entry_id: Optional[int] = None
     session_key: str
@@ -815,13 +858,14 @@ def record_set(x:SetEntry,u=Depends(me),s:Session=Depends(db)):
     except (ValueError,TypeError):exercises=[]
     match=next((e for i,e in enumerate(exercises) if isinstance(e,dict) and str(e.get("key") or f"exercise-{i}")==x.exercise_key),None) if isinstance(exercises,list) else None
     if not match or x.exercise_name!=match.get("name") or x.set_number<1 or x.set_number>int(match.get("sets",0)) or not 0<=x.load_kg<=2000:raise HTTPException(400,"Série inválida")
+    if x.load_unit not in ("kg", "lbs", "p"): raise HTTPException(400, "Unidade inválida")
     if x.reps is not None and not 0 <= x.reps <= 1000: raise HTTPException(400, "Repetições inválidas")
     if x.entry_id is not None:
         row=s.get(WorkoutSet,x.entry_id)
         if not row or row.session_key != x.session_key or (row.student_id,row.workout_id,row.exercise_key,row.set_number)!=(u.id,w.id,x.exercise_key,x.set_number): raise HTTPException(404)
-        row.load_kg=x.load_kg; row.reps=x.reps
+        row.load_kg=x.load_kg; row.reps=x.reps; row.load_unit=x.load_unit
     else:
-        row=WorkoutSet(workout_id=w.id,student_id=u.id,exercise_key=x.exercise_key,exercise_name=x.exercise_name,set_number=x.set_number,load_kg=x.load_kg,reps=x.reps,session_key=x.session_key)
+        row=WorkoutSet(workout_id=w.id,student_id=u.id,exercise_key=x.exercise_key,exercise_name=x.exercise_name,set_number=x.set_number,load_kg=x.load_kg,load_unit=x.load_unit,reps=x.reps,session_key=x.session_key)
         s.add(row)
     s.commit(); s.refresh(row); return {"ok":True,"id":row.id}
 
@@ -844,7 +888,7 @@ def student_frequency(sid:int, u=Depends(me), s:Session=Depends(db)):
 def workout_sets(wid:int,u=Depends(me),s:Session=Depends(db)):
     w=s.get(Workout,wid)
     if not w or (u.id!=w.student_id and u.id!=w.professor_id):raise HTTPException(404)
-    return [{"exercise_key":x.exercise_key,"exercise_name":x.exercise_name,"set_number":x.set_number,"load_kg":x.load_kg,"reps":x.reps,"performed_at":x.performed_at.isoformat()} for x in s.query(WorkoutSet).filter_by(workout_id=wid,student_id=w.student_id,session_key=None).order_by(WorkoutSet.performed_at).all()]
+    return [{"exercise_key":x.exercise_key,"exercise_name":x.exercise_name,"set_number":x.set_number,"load_kg":x.load_kg,"load_unit":x.load_unit,"reps":x.reps,"performed_at":x.performed_at.isoformat()} for x in s.query(WorkoutSet).filter_by(workout_id=wid,student_id=w.student_id,session_key=None).order_by(WorkoutSet.performed_at).all()]
 
 # Arquivos de exercícios: armazenamento persistente no banco (compatível com hospedagem efêmera).
 from fastapi.responses import Response
