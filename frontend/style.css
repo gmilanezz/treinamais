@@ -3882,3 +3882,45 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 .workout-success-progress { width: 100%; padding: 12px 0; border-bottom: 1px solid #333; }
 .workout-success-progress p { margin-top: 6px; }
 .workout-success-link { background: transparent; border: 0; color: var(--team-color); font: 18px "Bebas Neue", Arial, sans-serif; padding: 12px; cursor: pointer; }
+
+.auth .password-visibility-field {
+  position: relative;
+  display: block;
+  min-width: 0;
+  width: 100%;
+}
+.auth .password-visibility-field > .form-control {
+  padding-right: 52px !important;
+}
+.auth .password-visibility-toggle {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: var(--team-color, #65f6d2);
+  cursor: pointer;
+}
+.auth .password-visibility-toggle svg {
+  width: 22px;
+  height: 22px;
+  pointer-events: none;
+}
+.auth .password-visibility-slash {
+  display: none;
+}
+.auth .password-visibility-toggle[aria-pressed="true"] .password-visibility-slash {
+  display: block;
+}
+.auth .password-visibility-toggle:focus-visible {
+  outline: 2px solid var(--team-color, #65f6d2);
+  outline-offset: -3px;
+  border-radius: 8px;
+}
