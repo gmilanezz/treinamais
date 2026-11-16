@@ -144,6 +144,7 @@ class WorkoutSet(Base):
     load_kg = Column(Float)
     load_unit = Column(String, default="kg", nullable=False)
     reps = Column(Integer, nullable=True)
+    student_note = Column(String, nullable=True)
     session_key = Column(String, nullable=True)
     performed_at = Column(DateTime, default=datetime.utcnow)
 
@@ -196,6 +197,10 @@ with engine.begin() as conn:
 with engine.begin() as conn:
     if "load_unit" not in {c["name"] for c in inspect(conn).get_columns("workout_sets")}:
         conn.execute(text("ALTER TABLE workout_sets ADD COLUMN load_unit VARCHAR NOT NULL DEFAULT 'kg'"))
+
+with engine.begin() as conn:
+    if "student_note" not in {c["name"] for c in inspect(conn).get_columns("workout_sets")}:
+        conn.execute(text("ALTER TABLE workout_sets ADD COLUMN student_note VARCHAR"))
 
 app = FastAPI(title="App de Treinos API")
 app.add_middleware(
@@ -594,9 +599,11 @@ def save_workout(x: WorkoutIn, u=Depends(me), s: Session = Depends(db)):
         raise HTTPException(403)
     w = Workout(professor_id=u.id, **x.model_dump())
     s.add(w)
+    s.flush()
+    workout_id = w.id
+    s.add(WorkoutNotification(student_id=x.student_id,message=f"Novo treino disponível: {w.title}"))
     s.commit()
-    s.add(WorkoutNotification(student_id=x.student_id,message=f"Novo treino disponível: {w.title}"));s.commit()
-    return {"id": w.id}
+    return {"id": workout_id}
 
 
 @app.put("/api/workouts/{wid}")
@@ -661,13 +668,21 @@ def complete(wid: int, session_key: str, u=Depends(me), s: Session = Depends(db)
             baseline[(row.exercise_key, row.set_number)] = row
     progress = []
     compared = 0
+    history = s.query(WorkoutSet).filter_by(student_id=u.id, session_key=None).all()
     for row in current:
         prior = baseline.get((row.exercise_key, row.set_number))
-        if not prior or prior.load_unit != row.load_unit:
-            continue
-        compared += 1
-        if row.load_kg > prior.load_kg or (row.reps is not None and prior.reps is not None and row.reps > prior.reps):
-            progress.append({"exercise": row.exercise_name, "series": row.set_number, "unit": row.load_unit, "old_load": prior.load_kg, "load": row.load_kg, "old_reps": prior.reps, "reps": row.reps})
+        if prior and (prior.load_unit != row.load_unit or prior.exercise_name != row.exercise_name):
+            prior = None
+        if prior:
+            compared += 1
+        comparable = [h for h in history if h.exercise_name.strip().casefold() == row.exercise_name.strip().casefold() and h.load_unit == row.load_unit]
+        record_load = bool(comparable) and row.load_kg > max(h.load_kg for h in comparable)
+        same_load = [h.reps for h in comparable if h.load_kg == row.load_kg and h.reps is not None]
+        record_reps = bool(same_load) and row.reps is not None and row.reps > max(same_load)
+        improved = prior and (row.load_kg > prior.load_kg or (row.reps is not None and prior.reps is not None and row.reps > prior.reps))
+        if improved or record_load or record_reps:
+            progress.append({"exercise": row.exercise_name, "series": row.set_number, "unit": row.load_unit, "old_load": prior.load_kg if prior else None, "load": row.load_kg, "old_reps": prior.reps if prior else None, "reps": row.reps, "record": record_load or record_reps})
+        history.append(row)
     s.query(WorkoutSet).filter_by(student_id=u.id, workout_id=wid, session_key=session_key).update({WorkoutSet.session_key: None})
     s.add(Completion(student_id=u.id, workout_id=wid))
     s.commit()
@@ -848,6 +863,7 @@ class SetEntry(BaseModel):
     reps: Optional[int] = None
     entry_id: Optional[int] = None
     session_key: str
+    student_note: str = ""
 
 @app.post("/api/workout-sets")
 def record_set(x:SetEntry,u=Depends(me),s:Session=Depends(db)):
@@ -860,6 +876,7 @@ def record_set(x:SetEntry,u=Depends(me),s:Session=Depends(db)):
     if not match or x.exercise_name!=match.get("name") or x.set_number<1 or x.set_number>int(match.get("sets",0)) or not 0<=x.load_kg<=2000:raise HTTPException(400,"Série inválida")
     if x.load_unit not in ("kg", "lbs", "p"): raise HTTPException(400, "Unidade inválida")
     if x.reps is not None and not 0 <= x.reps <= 1000: raise HTTPException(400, "Repetições inválidas")
+    if len(x.student_note) > 1000: raise HTTPException(400, "Observação muito longa")
     if x.entry_id is not None:
         row=s.get(WorkoutSet,x.entry_id)
         if not row or row.session_key != x.session_key or (row.student_id,row.workout_id,row.exercise_key,row.set_number)!=(u.id,w.id,x.exercise_key,x.set_number): raise HTTPException(404)
@@ -867,7 +884,9 @@ def record_set(x:SetEntry,u=Depends(me),s:Session=Depends(db)):
     else:
         row=WorkoutSet(workout_id=w.id,student_id=u.id,exercise_key=x.exercise_key,exercise_name=x.exercise_name,set_number=x.set_number,load_kg=x.load_kg,load_unit=x.load_unit,reps=x.reps,session_key=x.session_key)
         s.add(row)
-    s.commit(); s.refresh(row); return {"ok":True,"id":row.id}
+    row.student_note = x.student_note
+    s.flush(); row_id = row.id
+    s.commit(); return {"ok":True,"id":row_id}
 
 @app.delete("/api/workout-sets/{wid}/session/{session_key}")
 def cancel_session(wid:int, session_key:str, u=Depends(me), s:Session=Depends(db)):
@@ -888,7 +907,7 @@ def student_frequency(sid:int, u=Depends(me), s:Session=Depends(db)):
 def workout_sets(wid:int,u=Depends(me),s:Session=Depends(db)):
     w=s.get(Workout,wid)
     if not w or (u.id!=w.student_id and u.id!=w.professor_id):raise HTTPException(404)
-    return [{"exercise_key":x.exercise_key,"exercise_name":x.exercise_name,"set_number":x.set_number,"load_kg":x.load_kg,"load_unit":x.load_unit,"reps":x.reps,"performed_at":x.performed_at.isoformat()} for x in s.query(WorkoutSet).filter_by(workout_id=wid,student_id=w.student_id,session_key=None).order_by(WorkoutSet.performed_at).all()]
+    return [{"exercise_key":x.exercise_key,"exercise_name":x.exercise_name,"set_number":x.set_number,"load_kg":x.load_kg,"load_unit":x.load_unit,"reps":x.reps,"student_note":x.student_note,"performed_at":x.performed_at.isoformat()} for x in s.query(WorkoutSet).filter_by(workout_id=wid,student_id=w.student_id,session_key=None).order_by(WorkoutSet.performed_at).all()]
 
 # Arquivos de exercícios: armazenamento persistente no banco (compatível com hospedagem efêmera).
 from fastapi.responses import Response

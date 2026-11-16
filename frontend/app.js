@@ -22,7 +22,7 @@ async function req(p, o = {}) {
           ? detail.map((x) => x.msg || JSON.stringify(x)).join("; ")
           : detail && typeof detail === "object"
             ? detail.message || JSON.stringify(detail)
-            : "Erro na solicitação",
+            : `Erro na solicitação (HTTP ${r.status})`,
     );
   }
   return d;
@@ -94,7 +94,7 @@ document.addEventListener("click", (event) => {
   button.setAttribute("aria-label", visible ? "Ocultar senha" : "Mostrar senha");
 });
 function login() {
-  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<div><h1 class="page-heading accent">App de Treinos</h1><p class="text-paragraph muted">Agenda, treinos e evolução do time.</p></div><form class="app-form" id="f"><label class="field">Usuário<input class="form-control" id="u" autocomplete="username" required></label><label class="field">Senha${passwordVisibility(`<input class="form-control" id="p" type="password" autocomplete="current-password" required>`)}</label><button class="ui-button btn wide">Entrar</button><button type="button" class="ui-button forgot-link" onclick="forgotPassword()">Esqueci minha senha</button><p id="err" class="text-paragraph error"></p></form><div class="auth-divider"><span>Primeiro acesso?</span></div><div class="auth-actions"><button type="button" class="btn-action ui-button btn ghost" onclick="firstAccess(document.getElementById('u').value.trim().toLowerCase())">Primeiro acesso do aluno</button><button type="button" class="btn-action ui-button btn ghost" onclick="register('professor')">Criar conta de professor</button></div><a class="developer-contact-link" href="https://wa.me/5511933792008" target="_blank" rel="noopener noreferrer">Falar com o desenvolvedor do aplicativo</a></section></main>`;
+  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<div><h1 class="page-heading accent">App de Treinos</h1><p class="text-paragraph muted">Agenda, treinos e evolução do time.</p></div><form class="app-form" id="f"><label class="field">Usuário<input class="form-control" id="u" autocomplete="username" required></label><label class="field">Senha${passwordVisibility(`<input class="form-control" id="p" type="password" autocomplete="current-password" required>`)}</label><button class="ui-button btn wide">Entrar</button><button type="button" class="ui-button forgot-link" onclick="forgotPassword()">Esqueci minha senha</button><p id="err" class="text-paragraph error"></p></form><div class="auth-divider"><span>Primeiro acesso?</span></div><div class="auth-actions"><button type="button" class="btn-action ui-button btn ghost" onclick="firstAccess(document.getElementById('u').value.trim().toLowerCase())">Sou aluno e meu professor já me cadastrou</button><button type="button" class="btn-action ui-button btn ghost" onclick="register('professor')">Criar conta de professor</button></div><a class="developer-contact-link" href="https://wa.me/5511933792008" target="_blank" rel="noopener noreferrer">Falar com o desenvolvedor do aplicativo</a></section></main>`;
   f.onsubmit = async (e) => {
     e.preventDefault();
     let body = new URLSearchParams({
@@ -112,7 +112,7 @@ function login() {
   };
 }
 function firstAccess(username = "") {
-  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<button class="ui-button text-btn" onclick="login()">Voltar ao login</button><h1 class="page-heading">Primeiro acesso</h1><form class="app-form" id="firstAccessForm"><label class="field">Usuário<input class="form-control" name="username" autocomplete="username" required></label><label class="field">Código de acesso<input class="form-control" name="activation_code" maxlength="5" minlength="5" required></label><label class="field">Nova senha${passwordVisibility(`<input class="form-control" name="password" type="password" minlength="5" autocomplete="new-password" required>`)}</label><label class="field">Confirmar senha${passwordVisibility(`<input class="form-control" name="confirm" type="password" minlength="5" autocomplete="new-password" required>`)}</label><button class="ui-button btn wide">Definir senha</button><p class="error" role="alert"></p></form></section></main>`;
+  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<button class="ui-button text-btn" onclick="login()">Voltar ao login</button><h1 class="page-heading">Aluno, crie a sua senha</h1><p>Informe seu nome de usuário e crie a sua senha</p><form class="app-form" id="firstAccessForm"><label class="field">Usuário<input class="form-control" name="username" autocomplete="username" required></label><label class="field">Código de acesso<input class="form-control" name="activation_code" maxlength="5" minlength="5" required></label><label class="field">Nova senha${passwordVisibility(`<input class="form-control" name="password" type="password" minlength="5" autocomplete="new-password" required>`)}</label><label class="field">Confirmar senha${passwordVisibility(`<input class="form-control" name="confirm" type="password" minlength="5" autocomplete="new-password" required>`)}</label><button class="ui-button btn wide">Definir senha</button><p class="error" role="alert"></p></form></section></main>`;
   const form = document.getElementById("firstAccessForm");
   form.elements.username.value = username;
   form.onsubmit = async e => {
@@ -476,7 +476,9 @@ function drawProfileLoadChart(loads, term) {
     .toLocaleLowerCase("pt-BR");
   holder.classList.toggle("profile-load-empty", !q);
   if (!q) {
+    if (holder.previousElementSibling?.classList.contains("profile-search-title")) holder.previousElementSibling.remove();
     holder.innerHTML = '<p class="muted">Digite o nome de um exercício para acompanhar a sua progressão.</p>';
+    bindLoadReps(holder);
     return;
   }
   const rows = loads
@@ -490,14 +492,16 @@ function drawProfileLoadChart(loads, term) {
     .sort((a, b) => new Date(a.performed_at) - new Date(b.performed_at))
     .slice(-15);
   const max = x => loadScale(rows, x);
-  holder.innerHTML =
+  holder.previousElementSibling?.classList.contains("profile-search-title") && holder.previousElementSibling.remove();
+  const heading = document.createElement("h3"); heading.className = "profile-search-title"; heading.textContent = [...new Set(rows.map(x => x.exercise_name))].join(" · ") || term; holder.before(heading);
+  holder.innerHTML = (
     rows
       .map(
         (x) =>
           `<div class="profile-load-column load-reps-click" role="button" tabindex="0" data-reps="${x.reps ?? ''}" title="${escapeHTML(x.exercise_name || "Exercício")}: ${Number(x.load_kg)} ${loadUnit(x)}"><span>${Number(x.load_kg)} ${loadUnit(x)}</span><div style="height:${Math.max(6, (Number(x.load_kg) / max(x)) * 135)}px"></div><small>${escapeHTML(formatTreinaDate(x.performed_at))}</small></div>`,
       )
       .join("") ||
-    '<p class="muted">Nenhuma carga registrada para este exercício.</p>';
+    '<p class="muted">Nenhuma carga registrada para este exercício.</p>');
   bindLoadReps(holder);
 }
 async function contatosAluno() {
@@ -563,7 +567,8 @@ async function alunos() {
           username: su.value.trim().toLowerCase(),
         }),
       });
-      alert("Aluno cadastrado. A senha será definida pelo aluno no primeiro acesso.");
+      const message = `Olá, aluno. Te cadastrei no Treina+ e seu nome de usuário é ${su.value.trim().toLowerCase()}. Acesse o aplicativo e clique em “Sou aluno e meu professor já me cadastrou”. Depois, crie a sua senha.`;
+      prompt("Aluno cadastrado! Informe o nome de usuário ao aluno. Copie a mensagem abaixo:", message);
       await alunos();
     } catch (err) {
       alert(err.message);
@@ -587,7 +592,7 @@ function drawExerciseEditor() {
   box.innerHTML = workoutExercises
     .map(
       (x, i) =>
-        `<div class="exercise-edit exercise-edit-${i}"><b class="exercise-edit-heading">Exercício ${i + 1}</b><label class="field exercise-name-label">Nome<input class="form-control exercise-name-input" data-ex="${i}" data-prop="name" value="${escapeHTML(x.name)}" required></label><label class="field exercise-sets-label">Séries<input class="form-control exercise-sets-input" data-ex="${i}" data-prop="sets" type="number" min="1" max="20" value="${x.sets}" required></label><label class="field exercise-note-label">Observações<textarea class="form-textarea exercise-note-input" data-ex="${i}" data-prop="note">${escapeHTML(x.note)}</textarea></label><label class="exercise-media-label">Foto ou vídeo do exercício<input class="exercise-media-input" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" data-media-ex="${i}"></label>${x.media ? `<div class="exercise-media-preview">Mídia anexada · <button type="button" class="exercise-media-remove" data-remove-media="${i}">Remover mídia</button></div>` : ""}<button type="button" class="exercise-remove-button" onclick="removeExercise(${i})">Remover exercício</button></div>`,
+        `<div class="exercise-edit exercise-edit-${i}"><b class="exercise-edit-heading">Exercício ${i + 1}</b><label class="field exercise-name-label">Nome<input class="form-control exercise-name-input" data-ex="${i}" data-prop="name" value="${escapeHTML(x.name)}" required></label>${[["warmup_sets","Séries de aquecimento",0],["prep_sets","Séries preparatórias",0],["sets","Séries válidas",3]].map(([key,label,initial]) => `<label class="field exercise-range">${label}<output>${x[key] ?? initial}</output><input type="range" min="${key === "sets" ? 1 : 0}" max="${key === "sets" ? 10 : Math.max(5, Number(x[key]) || 0)}" step="1" data-ex="${i}" data-prop="${key}" value="${x[key] ?? initial}"></label>`).join("")}<div class="exercise-rep-range"><label>Repetições de<input type="number" min="1" max="1000" data-ex="${i}" data-prop="reps_min" value="${x.reps_min ?? ""}"></label><label>até<input type="number" min="1" max="1000" data-ex="${i}" data-prop="reps_max" value="${x.reps_max ?? ""}"></label></div><label class="field exercise-note-label">Observações<textarea class="form-textarea exercise-note-input" data-ex="${i}" data-prop="note">${escapeHTML(x.note)}</textarea></label><label class="exercise-media-label">Foto ou vídeo do exercício<input class="exercise-media-input" type="file" accept="image/jpeg,image/png,image/webp,video/mp4,video/webm" data-media-ex="${i}"></label>${x.media ? `<div class="exercise-media-preview">Mídia anexada · <button type="button" class="exercise-media-remove" data-remove-media="${i}">Remover mídia</button></div>` : ""}<button type="button" class="exercise-remove-button" onclick="removeExercise(${i})">Remover exercício</button></div>`,
     )
     .join("");
   box.querySelectorAll("[data-media-ex]").forEach((el) =>
@@ -627,7 +632,8 @@ function drawExerciseEditor() {
   box.querySelectorAll("[data-ex]").forEach((el) =>
     el.addEventListener("input", () => {
       workoutExercises[+el.dataset.ex][el.dataset.prop] =
-        el.dataset.prop === "sets" ? Number(el.value) : el.value;
+        ["sets","warmup_sets","prep_sets","reps_min","reps_max"].includes(el.dataset.prop) ? (el.value === "" ? null : Number(el.value)) : el.value;
+      if (el.type === "range") { if (el.dataset.prop !== "sets") { el.max = 5; workoutExercises[+el.dataset.ex][el.dataset.prop] = Number(el.value); } el.parentElement.querySelector("output").textContent = el.value; }
     }),
   );
 }
@@ -667,7 +673,7 @@ function formatPublishedExercises(content) {
     ? exercises
         .map(
           (x) =>
-            `<div class="student-workout-exercise"><strong>${escapeHTML(x.name || "Exercício")}</strong><span>${Number(x.sets) || 0} séries</span>${x.note ? `<small class="student-workout-exercise-note">${escapeHTML(x.note)}</small>` : ""}${exerciseMediaButton(x)}</div>`,
+            `<div class="student-workout-exercise"><strong>${escapeHTML(x.name || "Exercício")}</strong><span>${exercisePrescription(x)}</span>${x.note ? `<small class="student-workout-exercise-note">${escapeHTML(x.note)}</small>` : ""}${exerciseMediaButton(x)}</div>`,
         )
         .join("")
     : escapeHTML(content || "");
@@ -724,12 +730,13 @@ async function treino() {
       ? ex
           .map(
             (x) =>
-              `<div class="row">${escapeHTML(x.name)} · ${x.sets} séries</div>`,
+              `<div class="row">${escapeHTML(x.name)} · ${exercisePrescription(x)}</div>`,
           )
           .join("")
       : ex?.type === "cardio" ? `<p class="cardio-description">${escapeHTML(ex.description)}</p>` : escapeHTML(w.content);
   });
 }
+function exercisePrescription(ex) { return `Aquecimento: ${Number(ex.warmup_sets)||0} · Preparatórias: ${Number(ex.prep_sets)||0} · Válidas: ${Number(ex.sets)||0}${ex.reps_min && ex.reps_max ? ` · ${ex.reps_min} a ${ex.reps_max} repetições` : ""}`; }
 const workoutMenuIcon = `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><path d="M7 2h10l2 3v4l-3 3-2-2v12h-4V10l-2 2-3-3V5zM2 4h3v6H2zm17 0h3v6h-3z"/></svg>`;
 let workoutPlayer = null;
 async function treinoDetalhe(id) {
@@ -765,7 +772,7 @@ async function treinoDetalhe(id) {
   document.querySelector("#finishWorkout").onclick = () =>
     finishWorkoutTimer(id, w.title);
   document.querySelector("#trainingStage").innerHTML =
-    `<div class="workout-exercise-list">${exercises.map((x, i) => `<div class="workout-exercise-row"><strong>${escapeHTML(x.name)}</strong><span class="workout-exercise-count">${Number(x.sets) || 0} séries</span>${x.note ? `<small>${escapeHTML(x.note)}</small>` : ""}${exerciseMediaButton(x)}</div>`).join("")}</div>`;
+    `<div class="workout-exercise-list">${exercises.map((x, i) => `<div class="workout-exercise-row"><strong>${escapeHTML(x.name)}</strong><span class="workout-exercise-count">${exercisePrescription(x)}</span>${x.note ? `<small>${escapeHTML(x.note)}</small>` : ""}${exerciseMediaButton(x)}</div>`).join("")}</div>`;
   if (steps.length || cardio) document.querySelector("#startWorkout").click();
 }
 function renderWorkoutStep() {
@@ -781,7 +788,7 @@ function renderWorkoutStep() {
   }
   const group = p.steps.filter((x) => x.index === step.index);
   const groupIndex = group.findIndex((x) => x.set === step.set);
-  stage.innerHTML = `<div class="training-player-progress training-player-progress-text"><span>EXERCÍCIO ${step.index + 1}</span><span>SÉRIE ${step.set} DE ${Number(step.ex.sets) || 0}</span></div><h2 class="training-player-exercise">${escapeHTML(step.ex.name)}</h2>${exerciseMediaButton(step.ex)}${step.ex.note ? `<p class="training-player-note">${escapeHTML(step.ex.note)}</p>` : ""}<div class="training-series-pills">${group.map((x, i) => `<button type="button" class="training-series-pill ${i === groupIndex ? "selected" : ""} ${p.completed.has(p.steps.findIndex(y => y === x)) ? "completed" : ""}" onclick="selectWorkoutSeries(${p.steps.indexOf(x)})" aria-label="Ir para série ${i + 1}" aria-pressed="${i === groupIndex}">${i + 1}ª</button>`).join("")}</div><p class="training-last-load" id="trainingLastLoad">Última carga registrada: consultando...</p><form class="training-player-form training-player-modern" id="trainingSetForm"><div class="training-player-fields"><label>Carga<input class="training-player-load" name="load" type="number" min="0" max="2000" step="0.5" inputmode="decimal" required></label><label>Repetições feitas<input class="training-player-load" name="reps" type="number" min="0" max="1000" step="1" inputmode="numeric" required></label></div><fieldset class="training-unit-picker"><legend>Unidade de carga</legend><div class="training-unit-track">${["kg", "lbs", "p"].map(unit => `<label><input type="radio" name="load_unit" value="${unit}" ${unit === (p.entries[p.index]?.unit || p.lastUnit || "kg") ? "checked" : ""}><span>${unit}</span></label>`).join("")}</div></fieldset><button class="training-player-check training-player-action">${p.completed.has(p.index) ? "✓ Atualizar série" : "✓ Concluir série"}</button></form>`;
+  stage.innerHTML = `<div class="training-player-progress training-player-progress-text"><span>EXERCÍCIO ${step.index + 1}</span><span>SÉRIE ${step.set} DE ${Number(step.ex.sets) || 0}</span></div><h2 class="training-player-exercise">${escapeHTML(step.ex.name)}</h2><p class="training-prescription">${exercisePrescription(step.ex)}</p>${exerciseMediaButton(step.ex)}${step.ex.note ? `<p class="training-player-note">${escapeHTML(step.ex.note)}</p>` : ""}<div class="training-series-pills">${group.map((x, i) => `<button type="button" class="training-series-pill ${i === groupIndex ? "selected" : ""} ${p.completed.has(p.steps.findIndex(y => y === x)) ? "completed" : ""}" onclick="selectWorkoutSeries(${p.steps.indexOf(x)})" aria-label="Ir para série ${i + 1}" aria-pressed="${i === groupIndex}">${i + 1}ª</button>`).join("")}</div><p class="training-last-load" id="trainingLastLoad">Última carga registrada: consultando...</p><form class="training-player-form training-player-modern" id="trainingSetForm"><div class="training-player-fields"><label>Carga<input class="training-player-load" name="load" type="number" min="0" max="2000" step="0.5" inputmode="decimal" required></label><label class="training-reps-label"><span>Repetições feitas<button type="button" class="training-note-toggle" aria-label="Adicionar ou editar observação" aria-expanded="false" aria-controls="trainingNoteCard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg></button></span><input class="training-player-load" name="reps" type="number" min="0" max="1000" step="1" inputmode="numeric" required></label></div><fieldset class="training-unit-picker"><legend>Unidade de carga</legend><div class="training-unit-track">${["kg", "lbs", "p"].map(unit => `<label><input type="radio" name="load_unit" value="${unit}" ${unit === (p.entries[p.index]?.unit || p.lastUnit || "kg") ? "checked" : ""}><span>${unit}</span></label>`).join("")}</div></fieldset><dialog class="training-note-card" id="trainingNoteCard"><div class="training-note-header"><h2>Digite sua observação</h2><button type="button" class="training-note-close" aria-label="Fechar observação">×</button></div><label class="training-note-field"><span class="training-note-sr">Observação opcional</span><input type="text" name="student_note" maxlength="1000" value="${escapeHTML(p.noteDrafts?.[p.index] ?? p.entries[p.index]?.note ?? "")}" placeholder="Sua observação"></label><button type="button" class="training-note-save">Salvar observação</button></dialog><button class="training-player-check training-player-action">${p.completed.has(p.index) ? "✓ Atualizar série" : "✓ Concluir série"}</button></form>`;
   if (p.completed.size === p.steps.length && !p.editingCompleted) {
     const button = stage.querySelector(".training-player-check");
     const notice = document.createElement("p");
@@ -789,9 +796,23 @@ function renderWorkoutStep() {
     notice.setAttribute("role", "status");
     notice.textContent = "Clique em finalizar!";
     button.replaceWith(notice);
-    stage.querySelectorAll("#trainingSetForm input").forEach(x => x.disabled = true);
+    stage.querySelectorAll("#trainingSetForm input, .training-note-toggle").forEach(x => x.disabled = true);
     return;
   }
+  const noteCard = stage.querySelector("#trainingNoteCard");
+  const noteToggle = stage.querySelector(".training-note-toggle");
+  const noteInput = noteCard.querySelector("input");
+  const noteIndex = p.index;
+  const updateNote = () => {
+    (p.noteDrafts ||= {})[noteIndex] = noteInput.value;
+    noteToggle.classList.toggle("has-note", Boolean(noteInput.value.trim()));
+  };
+  updateNote();
+  noteInput.addEventListener("input", updateNote);
+  noteInput.addEventListener("keydown", e => { if (e.key === "Enter") { e.preventDefault(); noteCard.close(); } });
+  noteToggle.onclick = () => { if (!p.busy) { noteCard.showModal(); noteToggle.setAttribute("aria-expanded", "true"); noteInput.focus(); } };
+  noteCard.querySelectorAll(".training-note-close,.training-note-save").forEach(b => b.onclick = () => noteCard.close());
+  noteCard.addEventListener("close", () => { updateNote(); noteToggle.setAttribute("aria-expanded", "false"); });
   const unitTrack = stage.querySelector(".training-unit-track");
   let touchX = null;
   unitTrack.addEventListener("touchstart", e => { touchX = e.changedTouches[0].clientX; }, {passive:true});
@@ -809,7 +830,7 @@ function renderWorkoutStep() {
   showLastRegisteredLoad(p, step);
   document.querySelector("#trainingSetForm").onsubmit = async (e) => {
     e.preventDefault();
-    const button = e.target.querySelector("button");
+    const button = e.target.querySelector(".training-player-check");
     if (p.busy) return;
     p.busy = true;
     button.disabled = true;
@@ -827,10 +848,11 @@ function renderWorkoutStep() {
           load_unit: e.target.elements.load_unit.value,
           reps: Number(e.target.elements.reps.value),
           entry_id: p.entries[entryIndex]?.id ?? null,
+          student_note: e.target.elements.student_note.value,
         }),
       });
       p.lastUnit = e.target.elements.load_unit.value;
-      p.entries[entryIndex] = {id: saved.id, unit: p.lastUnit, load: e.target.elements.load.value, reps: e.target.elements.reps.value};
+      p.entries[entryIndex] = {id: saved.id, unit: p.lastUnit, load: e.target.elements.load.value, reps: e.target.elements.reps.value, note: e.target.elements.student_note.value};
       p.index = entryIndex;
       p.completed.add(entryIndex);
       p.savedSets = p.completed.size;
@@ -944,7 +966,7 @@ async function finishWorkoutTimer(id, title) {
   activeWorkoutTimer = null;
   workoutPlayer = null;
   const progress = result.progress || [];
-  view.innerHTML = `<section class="workout-success"><h1>Parabéns pelo treino!</h1><p>${escapeHTML(title)} concluído com sucesso.</p><strong class="workout-success-week">${result.week}</strong><p>Treinos realizados nesta semana</p><h2>Sua progressão</h2>${progress.length ? progress.map(row => `<div class="workout-success-progress"><strong>${escapeHTML(row.exercise)} · ${row.series}ª série</strong>${row.load > row.old_load ? `<p>Carga: ${row.old_load} → ${row.load} ${escapeHTML(row.unit)}</p>` : ""}${row.reps != null && row.old_reps != null && row.reps > row.old_reps ? `<p>Repetições: ${row.old_reps} → ${row.reps}</p>` : ""}</div>`).join("") : `<p>${result.compared ? "Nenhuma progressão registrada em relação ao último treino. Continue firme!" : "Ainda não há séries comparáveis do último treino. Continue registrando sua evolução!"}</p>`}<button type="button" class="workout-success-link" id="shareCompletedWorkout">Compartilhar treino</button><button type="button" class="workout-success-link" id="returnProfile">Voltar à página inicial</button></section>`;
+  view.innerHTML = `<section class="workout-success"><h1>Parabéns pelo treino!</h1><p>${escapeHTML(title)} concluído com sucesso.</p><strong class="workout-success-week">${result.week}</strong><p>Treinos realizados nesta semana</p><h2>Sua progressão</h2>${progress.length ? progress.map(row => `<div class="workout-success-progress"><strong>${row.record ? "🏆 " : ""}${escapeHTML(row.exercise)} · ${row.series}ª série</strong>${row.record ? `<p>Recorde pessoal!</p>` : ""}${row.old_load != null && row.load > row.old_load ? `<p>Carga: ${row.old_load} → ${row.load} ${escapeHTML(row.unit)}</p>` : ""}${row.reps != null && row.old_reps != null && row.reps > row.old_reps ? `<p>Repetições: ${row.old_reps} → ${row.reps}</p>` : ""}</div>`).join("") : `<p>${result.compared ? "Nenhuma progressão registrada em relação ao último treino. Continue firme!" : "Ainda não há séries comparáveis do último treino. Continue registrando sua evolução!"}</p>`}<button type="button" class="workout-success-link" id="shareCompletedWorkout">Compartilhar o treino</button><button type="button" class="workout-success-link" id="returnProfile">Voltar à página inicial</button></section>`;
   document.querySelector("#shareCompletedWorkout").onclick = () => shareWorkoutCard(title, duration);
   document.querySelector("#returnProfile").onclick = () => setTab("perfil");
 }
@@ -1051,7 +1073,7 @@ async function optimizePhoto(file) {
 async function evolucao() {
   let w = await req("/weights/" + user.id),
     max = Math.max(...w.map((x) => x.value), 1);
-  view.innerHTML = `<div class="grid"><section class="card"><div class="section-head"><h2 class="section-heading">Peso semanal</h2></div><form class="app-form" id="peso"><label class="field">Peso (kg)<input class="form-control" id="kg" type="number" step=".1" required></label><button class="btn-action ui-button btn">Registrar peso</button></form><div class="chart">${w.map((x) => `<div class="bar" style="height:${Math.max(12, (x.value / max) * 130)}px" title="${x.value} kg"><span class="bar-label">${String(x.measured_on).slice(5)}</span></div>`).join("")}</div></section><section class="card"><h2 class="section-heading">Foto de evolução</h2><p class="text-paragraph muted">Envie sua foto semanal. O arquivo fica vinculado exclusivamente à sua conta.</p><form class="app-form" id="photo"><label class="field">Imagens<input class="form-control" id="img" type="file" accept="image/*" multiple required></label><button class="btn-action ui-button btn">Enviar foto</button></form></section></div>`;
+  view.innerHTML = `<div class="grid"><section class="card"><div class="section-head"><h2 class="section-heading">Peso semanal</h2></div><form class="app-form" id="peso"><label class="field">Peso (kg)<input class="form-control" id="kg" type="number" step=".1" required></label><button class="btn-action ui-button btn">Registrar peso</button></form>${weightBarChart(w, "Histórico de pesos")}</section><section class="card"><h2 class="section-heading">Foto de evolução</h2><p class="text-paragraph muted">Envie sua foto semanal. O arquivo fica vinculado exclusivamente à sua conta.</p><form class="app-form" id="photo"><label class="field">Imagens<input class="form-control" id="img" type="file" accept="image/*" multiple required></label><button class="btn-action ui-button btn">Enviar foto</button></form></section></div>`;
   peso.onsubmit = async (e) => {
     e.preventDefault();
     await req("/weights", {
@@ -1167,17 +1189,17 @@ function weightBarChart(records, heading = "Histórico de pesos") {
     .filter((x) => Number.isFinite(Number(x.value)) && Number(x.value) > 0)
     .sort((a, b) => String(a.measured_on).localeCompare(String(b.measured_on)));
   if (!rows.length) return '<p class="muted">Nenhum peso registrado.</p>';
-  const max = Math.max(...rows.map((x) => Number(x.value)), 1);
+  const max = Math.max(...rows.slice(-15).map((x) => Number(x.value)), 1);
   const latest = rows[rows.length - 1],
     highest = rows.reduce((a, b) =>
       Number(a.value) >= Number(b.value) ? a : b,
     );
-  return `<section class="weight-chart-section"><h3>${escapeHTML(heading)}</h3><div class="weight-chart-highlights"><p class="weight-summary-line">Último registro: <strong>${escapeHTML(formatTreinaDate(latest.measured_on))}</strong></p><p class="weight-summary-line">Último peso: <strong>${Number(latest.value)} kg</strong></p><p class="weight-summary-line">Maior peso: <strong>${Number(highest.value)} kg</strong></p></div><p class="muted">Toque em uma barra para destacar o peso.</p><div class="weight-bar-chart" role="group" aria-label="Gráfico de barras do histórico de pesos">${rows
+  return `<section class="weight-chart-section"><h3>${escapeHTML(heading)}</h3><div class="weight-chart-highlights"><p class="weight-summary-line">Último registro: <strong>${escapeHTML(formatTreinaDate(latest.measured_on))}</strong></p><p class="weight-summary-line">Último peso: <strong>${Number(latest.value)} kg</strong></p><p class="weight-summary-line">Maior peso: <strong>${Number(highest.value)} kg</strong></p></div><p class="muted">Toque em uma barra para destacar o peso.</p><div class="weight-bar-chart" role="group" aria-label="Gráfico de barras do histórico de pesos">${rows.slice(-15)
     .map((x) => {
       const value = Number(x.value),
         date = String(x.measured_on || "");
       const label = date.slice(5).split("-").reverse().join("/");
-      return `<button type="button" class="weight-chart-column" aria-label="${escapeHTML(date)}: ${value} kg" onclick="showWeightValue(this)"><span class="weight-chart-value" aria-live="polite">${value} kg</span><span class="weight-chart-bar" style="height:${Math.max(8, (value / max) * 165)}px"></span><span class="weight-chart-date">${escapeHTML(label)}</span><span class="weight-chart-hidden" hidden>${value} kg</span></button>`;
+      return `<button type="button" class="weight-chart-column" aria-label="${escapeHTML(date)}: ${value} kg" onclick="showWeightValue(this)"><span class="weight-chart-value" aria-live="polite">${value} kg</span><span class="weight-chart-bar" style="height:${Math.max(8, (value / max) * 135)}px"></span><span class="weight-chart-date">${escapeHTML(label)}</span><span class="weight-chart-hidden" hidden>${value} kg</span></button>`;
     })
     .join("")}</div></section>`;
 }
@@ -1205,7 +1227,8 @@ function evaluationMode(id, mode) {
   const el = document.getElementById("evaluation-content-" + id);
   if (!d || !el) return;
   if (mode === "photos") {
-    el.innerHTML = `<div class="evaluation-photo-grid">${d.photos.map((p) => `<figure class="evaluation-photo-item"><a href="${escapeHTML(p.path.startsWith("data:") ? p.path : API.replace(/\/api$/, "") + p.path)}" target="_blank"><img class="evaluation-photo" src="${escapeHTML(p.path.startsWith("data:") ? p.path : API.replace(/\/api$/, "") + p.path)}" alt="Foto de evolução"></a><figcaption>${escapeHTML(formatTreinaDate(p.created_at))}</figcaption></figure>`).join("") || "Nenhuma foto registrada."}</div>`;
+    el.innerHTML = `<div class="evaluation-photo-grid">${d.photos.map((p) => `<figure class="evaluation-photo-item"><button type="button" class="evaluation-photo-open"><img class="evaluation-photo" src="${escapeHTML(p.path.startsWith("data:") ? p.path : API.replace(/\/api$/, "") + p.path)}" alt="Foto de evolução"></button><figcaption>${escapeHTML(formatTreinaDate(p.created_at))}</figcaption></figure>`).join("") || "Nenhuma foto registrada."}</div>`;
+    el.querySelectorAll(".evaluation-photo-open").forEach(button => button.onclick = () => { const dialog = document.createElement("dialog"); dialog.className = "exercise-media-dialog"; const close = document.createElement("button"); close.textContent = "✕ Fechar"; const img = button.querySelector("img").cloneNode(); dialog.append(close,img); document.body.append(dialog); close.onclick = () => dialog.close(); dialog.onclose = () => dialog.remove(); dialog.showModal(); });
     return;
   }
   if (mode === "weights") {
@@ -1219,6 +1242,11 @@ function evaluationMode(id, mode) {
     ...new Set(entries.map((x) => x.exercise_name).filter(Boolean)),
   ];
   el.innerHTML = `<div class="weight-chart-highlights"><p class="weight-summary-line">Frequência na semana: <strong>${d.frequency.week}</strong></p><p class="weight-summary-line">Frequência no mês: <strong>${d.frequency.month}</strong></p></div><label class="field">Buscar exercício<input id="exerciseSearch" class="form-control" list="exerciseOptions" placeholder="Digite o exercício"></label><datalist id="exerciseOptions">${options.map((x) => `<option value="${escapeHTML(x)}">`).join("")}</datalist><div id="loadChart"></div>`;
+  const notes = entries.filter(x => String(x.student_note || "").trim()).sort((a,b) => new Date(b.performed_at) - new Date(a.performed_at));
+  const notesSection = document.createElement("section");
+  notesSection.className = "evaluation-student-notes";
+  notesSection.innerHTML = `<h3>Observações do aluno</h3>${notes.length ? notes.map(x => `<article><h4>${escapeHTML(x.exercise_name || "Exercício")}</h4><time>${escapeHTML(new Date(x.performed_at).toLocaleDateString("pt-BR"))}</time><p>${escapeHTML(x.student_note)}</p></article>`).join("") : "<p>Nenhuma observação registrada.</p>"}`;
+  el.append(notesSection);
   const input = el.querySelector("#exerciseSearch");
   input.oninput = () => drawEvaluationLoadChart(id, input.value);
   drawEvaluationLoadChart(id, options[0] || "");
@@ -1263,7 +1291,7 @@ function drawEvaluationLoadChart(id, search) {
             day: "2-digit",
             month: "2-digit",
           });
-      return `<div class="evaluation-load-column load-reps-click" role="button" tabindex="0" data-reps="${x.reps ?? ''}" title="${escapeHTML(x.workoutTitle)} · ${escapeHTML(label)}: ${value} ${loadUnit(x)}"><span class="evaluation-load-value">${value} ${loadUnit(x)}</span><div class="evaluation-load-bar" style="height:${Math.max(8, (value / max(x)) * 155)}px"></div><span class="evaluation-load-date">${escapeHTML(label)}</span></div>`;
+      return `<div class="evaluation-load-column load-reps-click" role="button" tabindex="0" data-reps="${x.reps ?? ''}" data-note="${escapeHTML(x.student_note || "")}" title="${escapeHTML(x.workoutTitle)} · ${escapeHTML(label)}: ${value} ${loadUnit(x)}"><span class="evaluation-load-value">${value} ${loadUnit(x)}</span><div class="evaluation-load-bar" style="height:${Math.max(8, (value / max(x)) * 155)}px"></div><span class="evaluation-load-date">${escapeHTML(label)}</span></div>`;
     })
     .join("")}</div></section>`;
   bindLoadReps(el);
@@ -1283,7 +1311,7 @@ function bindLoadReps(holder) {
   const result = document.createElement("p");
   result.className = "load-reps-result"; result.setAttribute("aria-live", "polite");
   holder.after(legend, result);
-  bars.forEach(bar => { const show = () => { result.textContent = bar.dataset.reps === "" ? "Repetições não registradas." : `${bar.dataset.reps} repetições realizadas`; }; bar.onclick = show; bar.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(); } }; });
+  bars.forEach(bar => { const show = () => { result.textContent = bar.dataset.reps === "" ? "Repetições não registradas." : `${bar.dataset.reps} repetições realizadas`; if (bar.dataset.note) result.textContent += ` · Observação: ${bar.dataset.note}`; }; bar.onclick = show; bar.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); show(); } }; });
 }
 
 async function contato() {
@@ -1451,10 +1479,13 @@ async function showWorkoutEditor(studentId) {
   publishedWorkoutForm.onsubmit = async (e) => {
     e.preventDefault();
     const cardio = form.workoutType.value === "cardio";
-    if (!cardio && (!workoutExercises.length || workoutExercises.some((x) => !x.name?.trim() || Number(x.sets) < 1))) {
+    if (!cardio && (!workoutExercises.length || workoutExercises.some((x) => !x.name?.trim() || Number(x.sets) < 1 || Number(x.sets) > 10 || ((x.reps_min != null || x.reps_max != null) && (!x.reps_min || !x.reps_max || x.reps_min > x.reps_max))))) {
       alert("Informe exercícios e séries válidos.");
       return;
     }
+    const saveButton = form.querySelector(".workout-save-button");
+    if (saveButton.disabled) return;
+    saveButton.disabled = true;
     try {
       await req(w ? "/workouts/" + w.id : "/workouts", {
         method: w ? "PUT" : "POST",
@@ -1466,10 +1497,10 @@ async function showWorkoutEditor(studentId) {
         }),
       });
       editingWorkout = null;
-      treinosProfessor();
+      await treinosProfessor();
     } catch (err) {
       alert(err.message);
-    }
+    } finally { saveButton.disabled = false; }
   };
   panel.scrollIntoView({ behavior: "smooth" });
 }

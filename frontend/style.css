@@ -3252,7 +3252,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   margin: 10px 0 8px !important;
 }
 .training-player-modern {
-  margin-top: 70px !important;
+  margin-top: 30px !important;
   background: 0;
   border: 0;
 }
@@ -3697,7 +3697,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   min-width: 32px;
   min-height: 32px;
   font:
-    15px 'Arial',
+    15px "Arial",
     sans-serif !important;
   color: #fff;
   cursor: pointer;
@@ -3856,14 +3856,59 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   border-radius: 0 !important;
 }
 
-.training-unit-picker { border: 0; padding: 0; margin: 6px auto; width: min(100%, 260px); }
-.training-unit-picker legend { font: 12px Arial, sans-serif; text-align: center; margin-bottom: 5px; }
-.training-unit-track { display: flex; gap: 4px; overflow-x: auto; scroll-snap-type: x mandatory; border: 1px solid var(--accent); border-radius: 24px; padding: 3px; }
-.training-unit-track label { flex: 1 0 30%; position: relative; scroll-snap-align: center; cursor: pointer; }
-.training-unit-track input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
-.training-unit-track span { display: block; text-align: center; padding: 7px 10px; border-radius: 20px; font: 14px Arial, sans-serif; color: white; }
-.training-unit-track input:checked + span { background: var(--accent); color: #000; }
-.training-unit-track input:focus-visible + span { outline: 2px solid white; }
+.training-unit-picker {
+  border: 0;
+  padding: 0;
+  margin: 6px auto;
+  width: min(100%, 260px);
+}
+.training-unit-picker legend {
+  font:
+    12px Arial,
+    sans-serif;
+  text-align: center;
+  margin-bottom: 5px;
+}
+.training-unit-track {
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  border: 1px solid var(--accent);
+  border-radius: 24px;
+  padding: 3px;
+}
+.training-unit-track label {
+  flex: 1 0 30%;
+  position: relative;
+  scroll-snap-align: center;
+  cursor: pointer;
+}
+.training-unit-track input {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+.training-unit-track span {
+  display: block;
+  text-align: center;
+  padding: 7px 10px;
+  border-radius: 20px;
+  font:
+    14px Arial,
+    sans-serif;
+  color: white;
+}
+.training-unit-track input:checked + span {
+  background: var(--accent);
+  color: #000;
+}
+.training-unit-track input:focus-visible + span {
+  outline: 2px solid white;
+}
 
 .training-player-session-actions .training-player-start,
 .training-player-session-actions .training-player-finish {
@@ -3871,17 +3916,66 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   box-shadow: none !important;
 }
 
-.profile-load-chart.profile-load-empty { min-height: 0; align-items: center; padding: 16px 0; }
-.training-finish-notice { color: var(--team-color); text-align: center; font-size: 20px; font-weight: 700; margin: 12px 0; }
-.workout-success { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; padding: 24px 12px; color: #fff; }
-.workout-success h1, .workout-success h2 { font-family: "Bebas Neue", Arial, sans-serif; font-weight: 400; margin: 0; }
-.workout-success h1 { font-size: 36px; }
-.workout-success h2 { font-size: 26px; }
-.workout-success p { margin: 0; font-family: Arial, sans-serif; }
-.workout-success-week { color: var(--team-color); font-size: 48px; }
-.workout-success-progress { width: 100%; padding: 12px 0; border-bottom: 1px solid #333; }
-.workout-success-progress p { margin-top: 6px; }
-.workout-success-link { background: transparent; border: 0; color: var(--team-color); font: 18px "Bebas Neue", Arial, sans-serif; padding: 12px; cursor: pointer; }
+.profile-load-chart.profile-load-empty {
+  min-height: 0;
+  align-items: center;
+  padding: 16px 0;
+}
+.training-finish-notice {
+  color: var(--team-color);
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 12px 0;
+}
+.workout-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+  padding: 24px 12px;
+  color: #fff;
+}
+.workout-success h1,
+.workout-success h2 {
+  font-family: "Bebas Neue", Arial, sans-serif;
+  font-weight: 400;
+  margin: 0;
+}
+.workout-success h1 {
+  font-size: 36px;
+}
+.workout-success h2 {
+  font-size: 26px;
+}
+.workout-success p {
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+.workout-success-week {
+  color: var(--team-color);
+  font-size: 48px;
+}
+.workout-success-progress {
+  width: 100%;
+  padding: 12px 0;
+  border-bottom: 1px solid #333;
+}
+.workout-success-progress p {
+  margin-top: 6px;
+}
+.workout-success-link {
+  background: transparent;
+  border: 0;
+  color: var(--team-color);
+  font:
+    18px "Bebas Neue",
+    Arial,
+    sans-serif;
+  padding: 12px;
+  cursor: pointer;
+}
 
 .auth .password-visibility-field {
   position: relative;
@@ -3916,11 +4010,270 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 .auth .password-visibility-slash {
   display: none;
 }
-.auth .password-visibility-toggle[aria-pressed="true"] .password-visibility-slash {
+.auth
+  .password-visibility-toggle[aria-pressed="true"]
+  .password-visibility-slash {
   display: block;
 }
 .auth .password-visibility-toggle:focus-visible {
   outline: 2px solid var(--team-color, #65f6d2);
   outline-offset: -3px;
   border-radius: 8px;
+}
+
+.exercise-range {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  font:
+    13px Arial,
+    sans-serif;
+}
+.exercise-range input[type="range"] {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: var(--team-color);
+}
+.exercise-range output {
+  color: var(--team-color);
+}
+.exercise-rep-range {
+  display: flex;
+  gap: 12px;
+}
+.exercise-rep-range label {
+  flex: 1;
+  min-width: 0;
+  font:
+    12px Arial,
+    sans-serif;
+}
+.exercise-rep-range input {
+  width: 100%;
+}
+.training-prescription {
+  font:
+    12px Arial,
+    sans-serif;
+  text-align: center;
+  margin: 4px 0;
+}
+.training-student-note {
+  display: block;
+  font:
+    12px Arial,
+    sans-serif;
+}
+.training-student-note input {
+  width: 100%;
+  background: transparent;
+  color: white;
+  border: 0;
+  border-bottom: 1px solid var(--team-color);
+  padding: 6px;
+}
+#shareCompletedWorkout {
+  color: var(--team-color);
+  font-size: 24px;
+  font-weight: 700;
+}
+.profile-search-title {
+  font:
+    20px "Bebas Neue",
+    Arial,
+    sans-serif;
+  margin: 12px 0 0;
+}
+.evaluation-photo-open {
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  width: 100%;
+}
+.weight-chart-column {
+  flex: 0 0 62px;
+  min-width: 62px;
+  max-width: 62px;
+  gap: 4px;
+}
+.weight-chart-bar {
+  width: 100%;
+  border-radius: 9px 9px 2px 2px;
+}
+.weight-chart-value {
+  color: #fff;
+}
+.weight-bar-chart {
+  min-height: 175px;
+  gap: 12px;
+  padding: 26px 0 12px;
+}
+
+.workout-management .exercise-rep-range {
+  gap: 16px;
+  margin: 10px 0 4px;
+}
+.workout-management .exercise-rep-range label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #fff;
+}
+.workout-management .exercise-rep-range input[type="number"] {
+  appearance: textfield;
+  background: transparent !important;
+  color: #fff !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--team-color) !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  min-height: 42px;
+  padding: 8px 4px;
+  font:
+    16px Arial,
+    sans-serif;
+}
+.workout-management .exercise-rep-range input::-webkit-inner-spin-button,
+.workout-management .exercise-rep-range input::-webkit-outer-spin-button {
+  appearance: none;
+  margin: 0;
+}
+.training-reps-label {
+  position: relative;
+}
+.training-note-toggle {
+  position: absolute;
+  right: 0;
+  top: -14px;
+  transform: translateY(-25%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--team-color);
+  cursor: pointer;
+}
+.training-note-toggle svg {
+  width: 19px;
+  height: 19px;
+}
+.training-note-toggle.has-note::after {
+  content: "";
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--team-color);
+}
+.training-note-card {
+  width: min(90vw, 360px);
+  max-width: 360px;
+  box-sizing: border-box;
+  padding: 20px;
+  border: 1px solid var(--team-color);
+  border-radius: 14px;
+  background: #050505;
+  color: #fff;
+  margin: auto;
+}
+.training-note-card::backdrop {
+  background: rgba(0, 0, 0, 0.7);
+}
+.training-note-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.training-note-header h2 {
+  font:
+    24px "Bebas Neue",
+    Arial,
+    sans-serif;
+  margin: 0;
+}
+.training-note-close {
+  background: transparent;
+  border: 0;
+  color: #fff;
+  font:
+    24px Arial,
+    sans-serif;
+  cursor: pointer;
+}
+.training-note-field {
+  display: block;
+  margin: 18px 0;
+}
+.training-note-field input {
+  width: 100%;
+  background: transparent;
+  color: #fff;
+  border: 0;
+  border-bottom: 1px solid var(--team-color);
+  border-radius: 0;
+  padding: 10px 0;
+  font:
+    16px Arial,
+    sans-serif;
+}
+.training-note-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.training-note-save {
+  display: block;
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  color: var(--team-color);
+  font:
+    18px "Bebas Neue",
+    Arial,
+    sans-serif;
+  cursor: pointer;
+}
+.evaluation-student-notes {
+  margin-top: 30px;
+}
+
+.evaluation-student-notes h3 {
+  font:
+    22px "Bebas Neue",
+    Arial,
+    sans-serif;
+  margin-bottom: 0;
+}
+.evaluation-student-notes article {
+  padding: 12px 0;
+  border-bottom: 1px solid #333;
+}
+.evaluation-student-notes h4 {
+  font:
+    18px "Bebas Neue",
+    Arial,
+    sans-serif;
+  margin: 0 0 4px;
+}
+.evaluation-student-notes time {
+  color: var(--team-color);
+  font:
+    12px Arial,
+    sans-serif;
+}
+.evaluation-student-notes p {
+  font:
+    14px/1.4 Arial,
+    sans-serif;
+  margin: 8px 0 0;
+  overflow-wrap: anywhere;
 }
