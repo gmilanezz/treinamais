@@ -1,6 +1,6 @@
 {
-  "name": "App de Treinos",
-  "short_name": "App de Treinos",
+  "name": "Treina+",
+  "short_name": "Treina+",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#050707",

@@ -202,7 +202,7 @@ with engine.begin() as conn:
     if "student_note" not in {c["name"] for c in inspect(conn).get_columns("workout_sets")}:
         conn.execute(text("ALTER TABLE workout_sets ADD COLUMN student_note VARCHAR"))
 
-app = FastAPI(title="App de Treinos API")
+app = FastAPI(title="Treina+ API")
 app.add_middleware(
     CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"]
 )
