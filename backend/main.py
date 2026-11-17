@@ -39,6 +39,7 @@ elif DB.startswith("postgresql://"):
 
 engine = create_engine(
     DB,
+    pool_pre_ping=True,
     connect_args={"check_same_thread": False}
     if DB.startswith("sqlite")
     else {},
@@ -250,7 +251,6 @@ class StudentIn(BaseModel):
 
 class FirstAccessIn(BaseModel):
     username: str
-    activation_code: str
     password: str
 
 
@@ -259,7 +259,6 @@ class RegisterIn(BaseModel):
     username: str
     password: str
     role: str
-    invite_code: str
     professor_id: Optional[int] = None
     email: Optional[str] = None
     phone: Optional[str] = None
@@ -290,6 +289,8 @@ class WeightIn(BaseModel):
     measured_on: date = date.today()
 
 
+
+
 INVITE_CODE = os.getenv("DANTE_INVITE_CODE", "DG5A1")
 
 
@@ -316,8 +317,9 @@ def put_branding(x: BrandingIn, u=Depends(me), s: Session = Depends(db)):
     u.theme_color = x.color
     u.brand_logo = None
     if x.phone is not None: u.phone = x.phone
+    result = {"ok": True, "color": u.theme_color, "logo": None, "professor": u.name, "phone": u.phone or ""}
     s.commit()
-    return {"ok":True}
+    return result
 
 
 @app.get("/api/public/professors")
@@ -333,9 +335,6 @@ def public_professors(s: Session = Depends(db)):
 
 @app.post("/api/register")
 def register(x: RegisterIn, s: Session = Depends(db)):
-    code = x.invite_code.strip().upper()
-    if len(code) != 5 or not code.isalnum() or code != INVITE_CODE.upper():
-        raise HTTPException(403, "Código de acesso inválido")
     if x.role != "professor":
         raise HTTPException(403, "Somente professores podem criar conta")
     if not x.phone or not re.fullmatch(r"[0-9]{11}", x.phone.strip()):
@@ -391,8 +390,6 @@ def first_access(x: FirstAccessIn, s: Session = Depends(db)):
         raise HTTPException(404, "Nome de usuário não existe. Consulte seu professor para verificar o nome de usuário.")
     if not (u.password_hash or "").startswith("pending:"):
         raise HTTPException(403, "Primeiro acesso já realizado. Entre com sua senha.")
-    if x.activation_code.strip().upper() != "DG5A1":
-        raise HTTPException(403, "Código de acesso incorreto")
     u.password_hash = pwd.hash(x.password)
     s.commit()
     return {"ok": True}

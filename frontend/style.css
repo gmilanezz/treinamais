@@ -4277,3 +4277,13 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   margin: 8px 0 0;
   overflow-wrap: anywhere;
 }
+.lesson-summary {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--team-color);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.lesson-summary p { margin: 4px 0 0; }
+.lesson-summary p b { color: var(--team-color); }
