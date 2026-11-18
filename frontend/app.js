@@ -191,6 +191,7 @@ async function register(role) {
   };
 }
 function saveSession(d) {
+  tabHistory.length = 0;
   token = d.access_token;
   user = d.user;
   localStorage.token = token;
@@ -235,7 +236,7 @@ function menuItems() {
       ];
 }
 function nav() {
-  return `<header class="topbar"><div class="brand-inline nav-logo-only">${logo()}</div><button class="ui-button menu-button" onclick="toggleMenu(true)" aria-label="Abrir menu"><span class="hamburger-icon" aria-hidden="true"><span class="hamburger-line hamburger-line-top"></span><span class="hamburger-line hamburger-line-middle"></span><span class="hamburger-line hamburger-line-bottom"></span></span></button><div class="user-chip"><div class="user-chip-details"><b class="user-name">${user.name}</b><span class="user-role">${user.role}</span></div></div></header><div class="menu-overlay" onclick="toggleMenu(false)"></div><aside class="sidebar"><div class="sidebar-head">${logo()}<button class="ui-button menu-close" onclick="toggleMenu(false)">×</button></div><div class="profile"><b class="profile-name">${user.name}</b><span class="profile-role">${user.role === "student" ? "Aluno" : "Equipe"}</span></div><nav class="side-nav">${menuItems()
+  return `<header class="topbar"><button type="button" class="brand-inline nav-logo-only agenda-logo-button" onclick="goToAgenda()" aria-label="Abrir agenda">${logo()}</button><button class="ui-button menu-button" onclick="toggleMenu(true)" aria-label="Abrir menu"><span class="hamburger-icon" aria-hidden="true"><span class="hamburger-line hamburger-line-top"></span><span class="hamburger-line hamburger-line-middle"></span><span class="hamburger-line hamburger-line-bottom"></span></span></button><div class="user-chip"><div class="user-chip-details"><b class="user-name">${user.name}</b><span class="user-role">${user.role}</span></div></div></header><div class="menu-overlay" onclick="toggleMenu(false)"></div><aside class="sidebar"><div class="sidebar-head"><button type="button" class="agenda-logo-button" onclick="goToAgenda()" aria-label="Abrir agenda">${logo()}</button><button class="ui-button menu-close" onclick="toggleMenu(false)">×</button></div><div class="profile"><b class="profile-name">${user.name}</b><span class="profile-role">${user.role === "student" ? "Aluno" : "Equipe"}</span></div><nav class="side-nav">${menuItems()
     .map(
       (x) =>
         `<button class="ui-button side-link ${tab === x[0] ? "active" : ""}" onclick="setTab('${x[0]}')"><i class="side-icon">${x[1]}</i><span class="side-label">${x[2]}</span></button>`,
@@ -244,26 +245,42 @@ function nav() {
       "",
     )}</nav><button class="ui-button side-link logout" onclick="logout()"><i class="side-icon">↪</i><span class="side-label">Sair</span></button></aside>`;
 }
-let previousTab = null;
-function goBack() {
-  const target = previousTab || "agenda";
-  previousTab = null;
-  tab = target;
-  render();
+const tabHistory = [];
+const pageDescriptions = {
+  professor: { agenda: "Agende aulas e acompanhe os compromissos dos seus alunos.", alunos: "Cadastre, edite e gerencie seus alunos e consulte seus calendários.", treinos: "Cadastre, edite e exclua treinos para os seus alunos.", pagamentos: "Gerencie os pagamentos e acompanhe as mensalidades dos seus alunos.", fotos: "Acompanhe as fotos, os pesos e a evolução dos seus alunos.", marca: "Personalize a cor da identidade visual do aplicativo.", contato: "Consulte os contatos dos seus alunos e atualize seu telefone." },
+  student: { treino: "Consulte seus treinos e registre suas cargas e repetições durante os exercícios.", aulas: "Consulte suas aulas agendadas e acompanhe seus status.", evolucao: "Registre seu peso e suas fotos e acompanhe sua evolução.", perfil: "Consulte seus dados, sua frequência e seu progresso nos treinos.", contato: "Consulte os contatos disponíveis e fale com seu professor." }
+};
+async function confirmNavigation() {
+  if (!workoutPlayer) return true;
+  if (workoutPlayer.busy) return false;
+  await cancelWorkoutSession();
+  return !workoutPlayer;
 }
-function setTab(nextTab) {
-  if (tab !== nextTab) previousTab = tab;
+async function goBack() {
+  if (workoutPlayer) { await confirmNavigation(); return; }
+  if (document.querySelector('.student-profile-card')) return alunos();
+  if (document.querySelector('.workout-success')) return treino();
+  if (!tabHistory.length) return;
+  tab = tabHistory.pop();
+  toggleMenu(false);
+  return render();
+}
+async function setTab(nextTab) {
+  if (!menuItems().some(item => item[0] === nextTab)) return;
+  if (!await confirmNavigation()) return;
+  if (tab !== nextTab) tabHistory.push(tab);
   tab = nextTab;
   toggleMenu(false);
-  render();
+  return render();
 }
+function goToAgenda() { return setTab(user.role === "student" ? "aulas" : "agenda"); }
 
 function toggleMenu(open) {
   document.body.classList.toggle("menu-open", open);
 }
 async function render() {
   if (!token) return login();
-  app.innerHTML = `${nav()}<main class="shell"><div class="page-title">${previousTab && previousTab !== tab ? `<button class="ui-button btn back-navigation" onclick="goBack()">← Voltar</button>` : ""}<h1 class="page-heading">${menuItems().find((x) => x[0] === tab)?.[2] || "Painel"}</h1></div><div id="view"></div></main>`;
+  app.innerHTML = `${nav()}<main class="shell"><div class="page-title">${tabHistory.length > 0 ? `<button class="ui-button btn back-navigation" onclick="goBack()">← Voltar</button>` : ""}<h1 class="page-heading">${menuItems().find((x) => x[0] === tab)?.[2] || "Painel"}</h1><p class="page-description">${pageDescriptions[user.role]?.[tab] || ""}</p></div><div id="view"></div></main>`;
 
   try {
     if (tab === "contato") return contato();
@@ -417,8 +434,7 @@ async function studentLessonDelete(sid, id) {
 }
 async function studentPayment(id) {
   expandedPaymentStudents.add(String(id));
-  tab = "pagamentos";
-  await render();
+  await setTab("pagamentos");
   const el = document.querySelector(`[data-payment-student="${id}"]`);
   if (el) {
     el.open = true;
@@ -906,7 +922,7 @@ async function cancelWorkoutSession() {
   p.busy = true;
   try {
     await req(`/workout-sets/${p.id}/session/${p.sessionKey}`, {method:"DELETE"});
-    leaveWorkoutPlayer();
+    await leaveWorkoutPlayer();
   } catch(err) { alert(err.message); } finally { p.busy = false; }
 }
 function selectWorkoutSeries(index) {
@@ -931,7 +947,7 @@ function leaveWorkoutPlayer() {
     activeWorkoutTimer = null;
   }
   workoutPlayer = null;
-  treino();
+  return treino();
 }
 function drawLoadChart(i, rows) {
   const el = document.getElementById("chart-" + i);
@@ -1139,8 +1155,7 @@ async function evolucao() {
 }
 async function openEvaluationPage() {
   selectedStudentId = null;
-  tab = "fotos";
-  await render();
+  await setTab("fotos");
 }
 let evaluationOpenStudent = null;
 async function fotosAlunos() {
@@ -1151,8 +1166,7 @@ async function fotosAlunos() {
 let evaluationData = {};
 async function openStudentPhotos(id) {
   if (tab !== "fotos") {
-    tab = "fotos";
-    await fotosAlunos();
+    await setTab("fotos");
   }
   const detail = document.getElementById("evaluation-detail-" + id);
   if (!detail) return;
@@ -1376,8 +1390,7 @@ async function marcaProfessor() {
       }
       await loadBrand(saved.color ? saved : { ...brand, color });
       localStorage.setItem("brandSetup_" + user.id, "1");
-      tab = "agenda";
-      await render();
+      await setTab("agenda");
     } catch (err) {
       alert(err.message || "Não foi possível salvar a identidade. Tente novamente.");
     } finally {
@@ -1388,16 +1401,14 @@ async function marcaProfessor() {
 }
 
 function welcomeProfessor() {
-  tab = "marca";
-  render().then(() => {
+  setTab("marca").then(() => {
     const h = document.querySelector(".page-heading");
     if (h) h.textContent = "Bem-vindo, professor!";
   });
 }
 let editingWorkout = null;
 async function studentWorkout(id) {
-  tab = "treinos";
-  await render();
+  await setTab("treinos");
   const row = document.getElementById("student-workouts-" + id);
   if (row) {
     row.open = true;
@@ -1636,13 +1647,14 @@ function logout() {
   if (favicon) favicon.href = defaultLogoIcon(brand.color);
   const manifest = document.querySelector("link[rel=manifest]");
   if (manifest) manifest.href = "/manifest.json";
-  previousTab = null;
+  tabHistory.length = 0;
   tab = "agenda";
   login();
 }
 Object.assign(window, {
   login,
   goBack,
+  goToAgenda,
   studentWorkout,
   treinosProfessor,
   closeWorkoutEditor,

@@ -4287,3 +4287,13 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 }
 .lesson-summary p { margin: 4px 0 0; }
 .lesson-summary p b { color: var(--team-color); }
+
+.agenda-logo-button { background: transparent; border: 0; padding: 0; cursor: pointer; color: inherit; display: inline-flex; align-items: center; }
+.agenda-logo-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.page-description { font-family: Arial, sans-serif; font-size: 14px; line-height: 1.45; color: var(--muted); margin: 8px 0 0; }
+@supports (-webkit-touch-callout: none) {
+  @media (hover: none) and (pointer: coarse) {
+    html body input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not(.training-player-load),
+    html body textarea, html body select { font-size: max(16px, 1em) !important; }
+  }
+}
