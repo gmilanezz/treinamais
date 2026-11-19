@@ -4297,3 +4297,13 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
     html body textarea, html body select { font-size: max(16px, 1em) !important; }
   }
 }
+
+.workout-management .workout-editor-form .workout-save-button {
+  border: 1px solid #fff !important;
+}
+.workout-management .workout-editor-form .exercise-remove-button {
+  border: 1px solid #ff0000 !important;
+}
+.workout-management .workout-editor-form .workout-add-exercise {
+  border: 1px solid #22c55e !important;
+}

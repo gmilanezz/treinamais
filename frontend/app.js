@@ -1,7 +1,7 @@
 const API = "/api";
 let token = localStorage.token,
   user = JSON.parse(localStorage.user || "null"),
-  tab = user?.role === "student" ? "perfil" : "agenda";
+  tab = user?.role === "student" ? "perfil" : "alunos";
 const $ = (s) => document.querySelector(s),
   headers = () => ({
     Authorization: `Bearer ${token}`,
@@ -162,9 +162,16 @@ function forgotPassword() {
   };
 }
 
+function validateUsernameField(input) {
+  const validate = () => input.setCustomValidity(/\s/u.test(input.value) ? "O nome de usuário não pode conter espaços." : "");
+  input.addEventListener("input", validate);
+  validate();
+}
+
 async function register(role) {
   if (role !== "professor") return login();
-  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<button class="ui-button text-btn" onclick="login()">Voltar ao login</button><div><h1 class="page-heading">Professor</h1><p class="text-paragraph muted">Crie sua conta para testar o Treina+.</p></div><form class="app-form" id="rf"><label class="field">Nome completo<input class="form-control" id="rn" required></label><label class="field">Usuário<input class="form-control" id="ru" required></label><label class="field phone-required-label">Telefone com DDD 11 dígitos sem espaços<input class="form-control" id="rphone" type="tel" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="11999999999" required></label><label class="field">Senha${passwordVisibility(`<input class="form-control" id="rpass" type="password" minlength="5" required>`)}</label><button class="btn-action ui-button btn wide">Criar conta</button><p id="rerr" class="text-paragraph error"></p></form><a class="developer-contact-link" href="https://wa.me/5511933792008" target="_blank" rel="noopener noreferrer">Falar com o desenvolvedor do aplicativo</a></section></main>`;
+  app.innerHTML = `<main class="auth"><section class="auth-card">${logo()}<button class="ui-button text-btn" onclick="login()">Voltar ao login</button><div><h1 class="page-heading">Professor</h1><p class="text-paragraph muted">Crie sua conta para testar o Treina+.</p></div><form class="app-form" id="rf"><label class="field">Nome completo<input class="form-control" id="rn" required></label><label class="field">Usuário<input class="form-control" id="ru" required pattern="[^\\s]+" title="O nome de usuário não pode conter espaços." autocapitalize="none" spellcheck="false"></label><label class="field phone-required-label">Telefone com DDD 11 dígitos sem espaços<input class="form-control" id="rphone" type="tel" inputmode="numeric" maxlength="11" pattern="[0-9]{11}" placeholder="11999999999" required></label><label class="field">Senha${passwordVisibility(`<input class="form-control" id="rpass" type="password" minlength="5" required>`)}</label><button class="btn-action ui-button btn wide">Criar conta</button><p id="rerr" class="text-paragraph error"></p></form><a class="developer-contact-link" href="https://wa.me/5511933792008" target="_blank" rel="noopener noreferrer">Falar com o desenvolvedor do aplicativo</a></section></main>`;
+  validateUsernameField(document.getElementById("ru"));
   rf.onsubmit = async (e) => {
     e.preventDefault();
     try {
@@ -196,7 +203,7 @@ function saveSession(d) {
   user = d.user;
   localStorage.token = token;
   localStorage.user = JSON.stringify(user);
-  tab = user.role === "student" ? "perfil" : "agenda";
+  tab = user.role === "student" ? "perfil" : "alunos";
   if (user.role === "student") {
     req("/me")
       .then((details) => {
@@ -207,14 +214,7 @@ function saveSession(d) {
       })
       .catch(() => {});
   }
-  loadBrand().then(() => {
-    if (
-      user.role === "professor" &&
-      !localStorage.getItem("brandSetup_" + user.id)
-    )
-      welcomeProfessor();
-    else render();
-  });
+  loadBrand().then(render);
 }
 function menuItems() {
   return user.role === "student"
@@ -361,13 +361,15 @@ async function agenda() {
   const daily = rows
     .filter((x) => x.scheduled_date === localDate)
     .sort((a, b) => String(a.time).localeCompare(String(b.time)));
-  view.innerHTML = `<div class="agenda-layout"><section class="agenda-schedule-card"><h2 class="agenda-title">Cadastrar aula</h2><form class="agenda-form" id="lf"><label class="agenda-field">Aluno<select class="agenda-select" name="student_id" required>${students.map((x) => `<option value="${x.id}">${escapeHTML(x.name)}</option>`).join("")}</select></label><label class="agenda-field">Data<input class="agenda-input" type="date" name="scheduled_date" value="${localDate}" required></label><label class="agenda-field">Horário<input class="agenda-input" type="time" name="time" required></label><button class="agenda-submit agenda-action" type="submit">Agendar aula</button></form></section><section class="agenda-daily-card"><h2 class="agenda-title">Aulas do dia</h2><p class="agenda-date">${today.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</p><div class="agenda-daily-list">${daily.map((x) => `<article class="agenda-lesson"><div class="agenda-lesson-info"><strong class="agenda-student-name">${escapeHTML(x.student)}</strong><span class="agenda-lesson-time">${escapeHTML(x.time)}</span><span class="agenda-lesson-status agenda-status-${x.status || "pending"}">${x.status === "completed" ? "Concluída" : x.status === "cancelled" ? "Cancelada" : "Pendente"}</span></div><div class="agenda-actions"><button class="agenda-complete agenda-action" onclick="changeLesson(${x.id},'completed')" aria-label="Concluir aula" title="Concluir aula" ${x.status === "completed" ? "disabled" : ""}>✓</button><button class="btn-action agenda-delete agenda-action" onclick="delLesson(${x.id})" aria-label="Excluir aula" title="Excluir aula">Excluir</button></div></article>`).join("") || '<p class="agenda-empty">Nenhuma aula agendada para hoje.</p>'}</div></section></div>`;
-  lf.onsubmit = async (e) => {
+  view.innerHTML = `<div class="agenda-layout"><section class="agenda-schedule-card"><h2 class="agenda-title">Cadastrar aula</h2>${students.length ? `<form class="agenda-form" id="lf"><label class="agenda-field">Aluno<select class="agenda-select" name="student_id" required>${students.map((x) => `<option value="${x.id}">${escapeHTML(x.name)}</option>`).join("")}</select></label><label class="agenda-field">Data<input class="agenda-input" type="date" name="scheduled_date" value="${localDate}" required></label><label class="agenda-field">Horário<input class="agenda-input" type="time" name="time" required></label><button class="agenda-submit agenda-action" type="submit">Agendar aula</button></form>` : `<p class="agenda-empty">Nenhum aluno cadastrado. Cadastre um aluno primeiro para agendar aulas.</p><button type="button" class="agenda-submit agenda-action" onclick="setTab('alunos')">Cadastrar aluno</button>`}</section><section class="agenda-daily-card"><h2 class="agenda-title">Aulas do dia</h2><p class="agenda-date">${today.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })}</p><div class="agenda-daily-list">${daily.map((x) => `<article class="agenda-lesson"><div class="agenda-lesson-info"><strong class="agenda-student-name">${escapeHTML(x.student)}</strong><span class="agenda-lesson-time">${escapeHTML(x.time)}</span><span class="agenda-lesson-status agenda-status-${x.status || "pending"}">${x.status === "completed" ? "Concluída" : x.status === "cancelled" ? "Cancelada" : "Pendente"}</span></div><div class="agenda-actions"><button class="agenda-complete agenda-action" onclick="changeLesson(${x.id},'completed')" aria-label="Concluir aula" title="Concluir aula" ${x.status === "completed" ? "disabled" : ""}>✓</button><button class="btn-action agenda-delete agenda-action" onclick="delLesson(${x.id})" aria-label="Excluir aula" title="Excluir aula">Excluir</button></div></article>`).join("") || '<p class="agenda-empty">Nenhuma aula agendada para hoje.</p>'}</div></section></div>`;
+  const lessonForm = document.getElementById("lf");
+  if (!lessonForm) return;
+  lessonForm.onsubmit = async (e) => {
     e.preventDefault();
     try {
       await req("/lessons", {
         method: "POST",
-        body: JSON.stringify(Object.fromEntries(new FormData(lf))),
+        body: JSON.stringify(Object.fromEntries(new FormData(lessonForm))),
       });
       render();
     } catch (err) {
@@ -563,13 +565,15 @@ function toggleStudentCreate() {
 }
 async function alunos() {
   const ss = await req("/students");
-  view.innerHTML = `<div class="grid"><section class="card student-create-surface"><button class="student-create-toggle" type="button" aria-expanded="false" aria-controls="student-create-body" onclick="toggleStudentCreate()">+ Adicionar aluno <span class="student-create-arrow">⌄</span></button><div class="student-create-body" id="student-create-body" hidden><p class="text-paragraph muted">O aluno define a senha no primeiro acesso usando seu nome de usuário.</p><form class="app-form" id="sf"><label class="field">Nome<input class="form-control" id="sn" required></label><label class="field">Usuário<input class="form-control" id="su" required></label><button class="ui-button btn">Cadastrar diretamente</button></form></div></section><section class="card"><h2 class="section-heading">Meus alunos</h2><div class="list">${ss.map((s) => `<div class="row student-list-row"><div class="student-card-actions"><button type="button" class="student-edit-action" data-edit-student="${s.id}" aria-label="Editar aluno" title="Editar aluno">Editar✎</button><button type="button" class="student-delete-action" data-delete-student="${s.id}" aria-label="Excluir aluno" title="Excluir aluno">Excluir×</button></div><div class="student-list-info"><b class="row-title">${escapeHTML(s.name)}</b><div class="muted">@${escapeHTML(s.username)}</div></div><div class="student-nav-actions"><button class="student-nav-button" aria-label="Treinos" title="Treinos" onclick="studentWorkout(${s.id})"><span class="student-nav-icon">🏋️</span></button><button class="student-nav-button" aria-label="Avaliação" title="Avaliação" onclick="openEvaluationPage()"><svg class="student-evaluation-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l6-6 4 4 6-8M14 7h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="student-nav-button" aria-label="Calendário" title="Calendário" onclick="studentCalendar(${s.id})"><svg class="student-calendar-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 3v4M17 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><button class="student-nav-button" aria-label="Pagamento" title="Pagamento" onclick="studentPayment(${s.id})"><span class="student-nav-icon">💳</span></button><button class="student-nav-button" aria-label="Perfil" title="Perfil" onclick="studentProfile(${s.id})"><span class="student-nav-icon">👤</span></button></div><div class="student-inline-calendar" id="student-inline-calendar-${s.id}" hidden></div></div>`).join("") || '<span class="empty">Nenhum aluno.</span>'}</div></section></div><div id="editor"></div>`;
+  view.innerHTML = `<div class="grid"><section class="card student-create-surface"><button class="student-create-toggle" type="button" aria-expanded="false" aria-controls="student-create-body" onclick="toggleStudentCreate()">+ Adicionar aluno <span class="student-create-arrow">⌄</span></button><div class="student-create-body" id="student-create-body" hidden><p class="text-paragraph muted">O aluno define a senha no primeiro acesso usando seu nome de usuário.</p><form class="app-form" id="sf"><label class="field">Nome<input class="form-control" id="sn" required></label><label class="field">Usuário<input class="form-control" id="su" required pattern="[^\\s]+" title="O nome de usuário não pode conter espaços." autocapitalize="none" spellcheck="false"></label><button class="ui-button btn">Cadastrar diretamente</button></form></div></section><section class="card"><h2 class="section-heading">Meus alunos</h2><div class="list">${ss.map((s) => `<div class="row student-list-row"><div class="student-card-actions"><button type="button" class="student-edit-action" data-edit-student="${s.id}" aria-label="Editar aluno" title="Editar aluno">Editar✎</button><button type="button" class="student-delete-action" data-delete-student="${s.id}" aria-label="Excluir aluno" title="Excluir aluno">Excluir×</button></div><div class="student-list-info"><b class="row-title">${escapeHTML(s.name)}</b><div class="muted">@${escapeHTML(s.username)}</div></div><div class="student-nav-actions"><button class="student-nav-button" aria-label="Treinos" title="Treinos" onclick="studentWorkout(${s.id})"><span class="student-nav-icon">🏋️</span></button><button class="student-nav-button" aria-label="Avaliação" title="Avaliação" onclick="openEvaluationPage()"><svg class="student-evaluation-svg" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 17l6-6 4 4 6-8M14 7h6v6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="student-nav-button" aria-label="Calendário" title="Calendário" onclick="studentCalendar(${s.id})"><svg class="student-calendar-svg" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M7 3v4M17 3v4M3 10h18" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></button><button class="student-nav-button" aria-label="Pagamento" title="Pagamento" onclick="studentPayment(${s.id})"><span class="student-nav-icon">💳</span></button><button class="student-nav-button" aria-label="Perfil" title="Perfil" onclick="studentProfile(${s.id})"><span class="student-nav-icon">👤</span></button></div><div class="student-inline-calendar" id="student-inline-calendar-${s.id}" hidden></div></div>`).join("") || '<span class="empty">Nenhum aluno.</span>'}</div></section></div><div id="editor"></div>`;
+  if (!ss.length) toggleStudentCreate();
   view.querySelectorAll('[data-edit-student]').forEach(button => button.onclick = () => {
     const st = ss.find(x => x.id === Number(button.dataset.editStudent));
     const editor = view.querySelector("#editor");
     const dialog = document.createElement("section");
     dialog.className = "card student-contact-edit-dialog student-inline-edit";
-    dialog.innerHTML = `<form class="app-form"><h2>Editar aluno</h2><label>Nome<input name="name" class="form-control" required value="${escapeHTML(st.name)}"></label><label>Usuário<input name="username" class="form-control" required value="${escapeHTML(st.username)}"></label><label>Telefone (opcional)<input name="phone" class="form-control" type="tel" pattern="[0-9]{11}" maxlength="11" value="${escapeHTML(st.phone || '')}"></label><button class="btn">Salvar</button><button type="button" class="student-dialog-cancel" data-close aria-label="Cancelar edição" title="Cancelar edição">×</button></form>`;
+    dialog.innerHTML = `<form class="app-form"><h2>Editar aluno</h2><label>Nome<input name="name" class="form-control" required value="${escapeHTML(st.name)}"></label><label>Usuário<input name="username" class="form-control" required pattern="[^\\s]+" title="O nome de usuário não pode conter espaços." autocapitalize="none" spellcheck="false" value="${escapeHTML(st.username)}"></label><label>Telefone (opcional)<input name="phone" class="form-control" type="tel" pattern="[0-9]{11}" maxlength="11" value="${escapeHTML(st.phone || '')}"></label><button class="btn">Salvar</button><button type="button" class="student-dialog-cancel" data-close aria-label="Cancelar edição" title="Cancelar edição">×</button></form>`;
+    validateUsernameField(dialog.querySelector('input[name="username"]'));
     editor.replaceChildren(dialog);
     dialog.querySelector('[data-close]').onclick = () => dialog.remove();
     dialog.scrollIntoView({behavior: "smooth", block: "nearest"});
@@ -582,6 +586,7 @@ async function alunos() {
     try { await req(`/students/${st.id}`, {method:"DELETE"}); await alunos(); }
     catch(err) { button.disabled = false; alert(err.message); }
   });
+  validateUsernameField(document.getElementById("su"));
   document.querySelector("#sf").onsubmit = async (e) => {
     e.preventDefault();
     try {
@@ -1648,7 +1653,7 @@ function logout() {
   const manifest = document.querySelector("link[rel=manifest]");
   if (manifest) manifest.href = "/manifest.json";
   tabHistory.length = 0;
-  tab = "agenda";
+  tab = "alunos";
   login();
 }
 Object.assign(window, {

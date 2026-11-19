@@ -339,7 +339,11 @@ def register(x: RegisterIn, s: Session = Depends(db)):
         raise HTTPException(403, "Somente professores podem criar conta")
     if not x.phone or not re.fullmatch(r"[0-9]{11}", x.phone.strip()):
         raise HTTPException(400, "Informe WhatsApp com DDD e 9 dígitos, sem espaços")
+    if re.search(r"\s", x.username):
+        raise HTTPException(400, "O nome de usuário não pode conter espaços")
     username = x.username.strip().casefold()
+    if not username:
+        raise HTTPException(400, "Informe o nome de usuário")
     if len(x.password) < 5:
         raise HTTPException(400, "A senha deve ter pelo menos 5 caracteres")
     if s.query(User).filter(func.lower(User.username) == username).first():
@@ -455,6 +459,8 @@ def students(u=Depends(me), s: Session = Depends(db)):
 @app.post("/api/students")
 def add_student(x: StudentIn, u=Depends(me), s: Session = Depends(db)):
     allow_prof(u)
+    if re.search(r"\s", x.username):
+        raise HTTPException(400, "O nome de usuário não pode conter espaços")
     if not x.name.strip() or not x.username.strip():
         raise HTTPException(400, "Informe nome e usuário")
     if s.query(User).filter(func.lower(User.username) == x.username.strip().casefold()).first():
@@ -484,6 +490,8 @@ def edit_student(sid: int, x: StudentEdit, u=Depends(me), s: Session=Depends(db)
     st = s.get(User, sid)
     if not st or st.role != "student" or st.professor_id != u.id:
         raise HTTPException(404, "Aluno não encontrado")
+    if re.search(r"\s", x.username):
+        raise HTTPException(400, "O nome de usuário não pode conter espaços")
     name, username = x.name.strip(), x.username.strip().casefold()
     phone = (x.phone or "").strip()
     if not name or not username or (phone and not re.fullmatch(r"[0-9]{11}", phone)):
