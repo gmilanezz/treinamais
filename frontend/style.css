@@ -4414,7 +4414,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   padding: 0;
   font-size: 16px;
   font-weight: 700;
-  text-align: left;
+  text-align: center;
 }
 .weekly-inline-choice label {
   position: relative;
@@ -4449,4 +4449,66 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
 .weekly-inline-choice label:has(input:focus-visible) {
   outline: 2px solid #fff;
   outline-offset: 3px;
+}
+
+.weekly-inline-choice {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  border: none;
+}
+
+.weekly-inline-choice legend {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.weekly-inline-choice label {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  box-sizing: border-box;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border: none;
+}
+
+
+/* Aula semanal ocupa toda a largura do formulário */
+.student-schedule-form .weekly-inline-choice {
+  grid-column: 1 / -1;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: none;
+  padding: 0;
+}
+
+.student-schedule-form .weekly-inline-choice legend {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.student-schedule-form .weekly-inline-choice .weekly-choice-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.student-schedule-form .weekly-inline-choice label {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  text-align: center;
+  border: none;
 }
