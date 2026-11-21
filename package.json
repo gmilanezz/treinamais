@@ -1,5 +1,5 @@
 {
-  "name": "dante-fit-app",
+  "name": "treinamais-app",
   "version": "1.0.0",
   "description": "Backend:",
   "main": "index.js",
@@ -8,16 +8,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/gmilanezz/dantegiovanni.git"
+    "url": "git+https://github.com/gmilanezz/treinamais.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "bugs": {
-    "url": "https://github.com/gmilanezz/dantegiovanni/issues"
+    "url": "https://github.com/gmilanezz/treinamais/issues"
   },
-  "homepage": "https://github.com/gmilanezz/dantegiovanni#readme",
+  "homepage": "https://github.com/gmilanezz/treinamais#readme",
   "devDependencies": {
     "gh-pages": "^6.3.0"
   }

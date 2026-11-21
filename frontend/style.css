@@ -4375,3 +4375,22 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   .auth:has(#f) { grid-template-columns: minmax(0, 1fr) minmax(0, 500px); gap: clamp(40px, 8vw, 120px); max-width: 1200px; margin-inline: auto; }
   .auth:has(#f)::before { content: 'TREINA+\A Agenda, treinos e evolução do time.'; white-space: pre-line; font: clamp(36px, 5vw, 68px)/1.15 'Bebas Neue', Arial, sans-serif; color: var(--team-color); border-left: 3px solid var(--team-color); padding-left: 32px; }
 }
+
+/* Confirmação de agendamento na própria interface, sem alert do navegador. */
+.weekly-lesson-overlay { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center; padding: 20px; background: rgba(0,0,0,.78); }
+.weekly-lesson-dialog { width: min(100%, 470px); max-height: calc(100dvh - 40px); overflow-y: auto; padding: clamp(20px, 4vw, 30px); border: 1px solid var(--accent, #65f6d2); border-radius: 16px; background: #101010; color: #fff; box-shadow: 0 16px 55px #000a; }
+.weekly-lesson-dialog h2 { margin: 0 0 14px; font-size: clamp(20px, 3vw, 25px); line-height: 1.25; }
+.weekly-lesson-dialog p { margin: 0 0 22px; color: #ddd; line-height: 1.6; }
+.weekly-lesson-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.weekly-lesson-actions button, .weekly-lesson-cancel { min-height: 46px; padding: 10px; border-radius: 9px; background: #000; color: #fff; font-size: 16px; cursor: pointer; }
+.weekly-lesson-actions button:first-child { border: 1px solid #fff; }
+.weekly-lesson-actions button:last-child { border: 1px solid var(--accent, #65f6d2); }
+.weekly-lesson-cancel { display: block; width: 100%; margin-top: 10px; border: 1px solid #555; }
+.weekly-lesson-dialog button:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+@media(max-width: 400px) { .weekly-lesson-actions { grid-template-columns: 1fr; } }
+
+/* Opção de recorrência exibida diretamente nos formulários de agendamento */
+.weekly-inline-choice { display:flex; flex-wrap:wrap; align-items:center; gap:12px 22px; margin:14px 0; padding:12px 14px; border:1px solid #555; border-radius:10px; min-width:0; color:inherit; }
+.weekly-inline-choice legend { padding:0 5px; font-weight:700; font-size:16px; }
+.weekly-inline-choice label { display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:16px; }
+.weekly-inline-choice input[type="radio"] { width:18px; height:18px; accent-color:var(--accent, #65f6d2); margin:0; }

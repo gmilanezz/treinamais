@@ -30,7 +30,7 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 if DATABASE_URL:
     DB = DATABASE_URL
 else:
-    DB = "sqlite:///" + os.path.join(BASE, "dante.db")
+    DB = "sqlite:///" + os.path.join(BASE, "treinamais.db")
 
 if DB.startswith("postgres://"):
     DB = DB.replace("postgres://", "postgresql+psycopg://", 1)
@@ -50,7 +50,6 @@ pwd = CryptContext(schemes=["bcrypt"])
 oauth = OAuth2PasswordBearer(tokenUrl="/api/login")
 SECRET = os.getenv("SECRET_KEY", "change-this-in-production")
 
-
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True)
@@ -66,7 +65,6 @@ class User(Base):
     theme_color = Column(String, nullable=True)
     brand_logo = Column(Text, nullable=True)
 
-
 class Lesson(Base):
     __tablename__ = "lessons"
     id = Column(Integer, primary_key=True)
@@ -80,7 +78,17 @@ class Lesson(Base):
     status = Column(String, default="pending")
     completed_at = Column(DateTime, nullable=True)
     cancelled_at = Column(DateTime, nullable=True)
+    recurrence_id = Column(Integer, nullable=True, index=True)
 
+class WeeklyLesson(Base):
+    __tablename__ = "weekly_lessons"
+    id = Column(Integer, primary_key=True)
+    professor_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    student_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    student_name = Column(String, default="")
+    start_date = Column(Date, nullable=False)
+    time = Column(String, nullable=False)
+    active = Column(Boolean, default=True)
 
 class Workout(Base):
     __tablename__ = "workouts"
@@ -91,7 +99,6 @@ class Workout(Base):
     content = Column(Text)
     periodization = Column(String, default="")
     updated_at = Column(DateTime, default=datetime.utcnow)
-
 
 class Completion(Base):
     __tablename__ = "completions"
@@ -172,7 +179,7 @@ with engine.begin() as conn:
         lesson_columns = {row[0] for row in conn.execute(text(
             "SELECT column_name FROM information_schema.columns WHERE table_name = 'lessons'"
         ))}
-    for col, definition in {"scheduled_date":"DATE", "status":"VARCHAR DEFAULT 'pending'", "completed_at":"DATETIME", "cancelled_at":"DATETIME"}.items():
+    for col, definition in {"scheduled_date":"DATE", "status":"VARCHAR DEFAULT 'pending'", "completed_at":"DATETIME", "cancelled_at":"DATETIME", "recurrence_id":"INTEGER"}.items():
         if col not in lesson_columns:
             conn.execute(text(f"ALTER TABLE lessons ADD COLUMN {col} {definition}"))
     if "student_name" not in lesson_columns:
@@ -288,17 +295,12 @@ class WeightIn(BaseModel):
     value: float
     measured_on: date = date.today()
 
-
-
-
-INVITE_CODE = os.getenv("DANTE_INVITE_CODE", "DG5A1")
-
+INVITE_CODE = os.getenv("treinamais_INVITE_CODE", "DG5A1")
 
 class BrandingIn(BaseModel):
     color: str = "#65f6d2"
     logo: str | None = None
     phone: str | None = None
-
 
 @app.get("/api/branding")
 def get_branding(u=Depends(me), s: Session = Depends(db)):
@@ -532,30 +534,57 @@ def del_student(sid: int, u=Depends(me), s: Session = Depends(db)):
     s.query(Payment).filter(Payment.plan_id.in_(s.query(PaymentPlan.id).filter_by(student_id=sid))).delete(synchronize_session=False)
     for model in (PaymentPlan, Lesson, Photo, Weight, WorkoutNotification, Workout):
         s.query(model).filter_by(student_id=sid).delete(synchronize_session=False)
+    s.query(WeeklyLesson).filter(WeeklyLesson.student_id == sid).delete(synchronize_session=False)
     s.delete(st)
     s.commit()
     return {"ok": True}
 
+
+def populate_weekly_lessons(s, u):
+    from datetime import timedelta
+    today = date.today()
+    end = today + timedelta(days=120)
+    rules = s.query(WeeklyLesson).filter(WeeklyLesson.professor_id == (u.id if u.role == "professor" else u.professor_id), WeeklyLesson.active == True)
+    if u.role == "student": rules = rules.filter(WeeklyLesson.student_id == u.id)
+    for rule in rules.all():
+        first = max(rule.start_date, today)
+        offset = (rule.start_date.weekday() - first.weekday()) % 7
+        current = first + timedelta(days=offset)
+        existing = {x.scheduled_date for x in s.query(Lesson).filter(Lesson.recurrence_id == rule.id, Lesson.scheduled_date >= first, Lesson.scheduled_date <= end).all()}
+        while current <= end:
+            if current not in existing:
+                s.add(Lesson(professor_id=rule.professor_id, student_id=rule.student_id, student_name=rule.student_name, scheduled_date=current, weekday=current.weekday(), time=rule.time, status="pending", recurrence_id=rule.id))
+            current += timedelta(days=7)
+    s.commit()
 
 def lesson_out(x):
     return {"id":x.id,"student":x.student_name,"student_id":x.student_id,"scheduled_date":x.scheduled_date.isoformat() if x.scheduled_date else None,"weekday":x.weekday,"time":x.time,"status":x.status or "pending"}
 
 @app.get("/api/lessons")
 def lessons(u=Depends(me), s:Session=Depends(db)):
+    populate_weekly_lessons(s, u)
     q=s.query(Lesson).filter(Lesson.professor_id==u.id) if u.role=="professor" else s.query(Lesson).filter(Lesson.student_id==u.id)
-    return [lesson_out(x) for x in q.order_by(Lesson.scheduled_date,Lesson.time).all()]
+    return [lesson_out(x) for x in q.filter(Lesson.status != "deleted").order_by(Lesson.scheduled_date,Lesson.time).all()]
 
 class DatedLessonIn(BaseModel):
     student_id:int
     scheduled_date:date
     time:str
+    weekly:bool=False
 
 @app.post("/api/lessons")
 def add_lesson(x:DatedLessonIn,u=Depends(me),s:Session=Depends(db)):
     allow_prof(u)
     student=s.get(User,x.student_id)
     if not student or student.professor_id!=u.id: raise HTTPException(404,"Aluno não encontrado")
-    a=Lesson(professor_id=u.id,student_id=student.id,student_name=student.name,scheduled_date=x.scheduled_date,weekday=x.scheduled_date.weekday(),time=x.time,status="pending")
+    from datetime import timedelta
+    recurrence_id = None
+    if x.weekly:
+        rule = WeeklyLesson(professor_id=u.id, student_id=student.id, student_name=student.name, start_date=x.scheduled_date, time=x.time, active=True)
+        s.add(rule)
+        s.flush()
+        recurrence_id = rule.id
+    a=Lesson(professor_id=u.id,student_id=student.id,student_name=student.name,scheduled_date=x.scheduled_date,weekday=x.scheduled_date.weekday(),time=x.time,status="pending",recurrence_id=recurrence_id)
     s.add(a);s.commit();return lesson_out(a)
 
 @app.patch("/api/lessons/{lid}/status")
@@ -574,7 +603,9 @@ def delete_lesson(lid:int,u=Depends(me),s:Session=Depends(db)):
     allow_prof(u)
     x=s.get(Lesson,lid)
     if not x or x.professor_id!=u.id:raise HTTPException(404)
-    s.delete(x);s.commit();return {"ok":True}
+    if x.recurrence_id: x.status = "deleted"
+    else: s.delete(x)
+    s.commit();return {"ok":True}
 
 @app.get("/api/workouts")
 def workouts(u=Depends(me), s: Session = Depends(db)):
