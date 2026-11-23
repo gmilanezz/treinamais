@@ -4426,7 +4426,7 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   padding: 12px 10px;
   border: 0;
   border-radius: 10px;
-  background: #242424;
+  background: #000;
   color: #fff;
   text-align: center;
   font-size: 16px;
@@ -4435,8 +4435,9 @@ button:not(.menu-button):not(.menu-close):not(.side-link):not(
   transition: background-color .15s ease, color .15s ease;
 }
 .weekly-inline-choice label:has(input:checked) {
-  background: var(--accent, #65f6d2);
-  color: #000;
+  background: #000;
+  color: #fff;
+  border: 1px solid var(--team-color);
 }
 .weekly-inline-choice input[type="radio"] {
   position: absolute;
